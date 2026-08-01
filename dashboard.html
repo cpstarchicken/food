@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"  />
+  <title>STAR CHICKEN </title>
+  <meta name="description" content="STAR CHICKEN Admin Dashboard — Manage products, prices, orders and branches." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --crimson: #9f1239;
+      --crimson-deep: #4c0519;
+      --crimson-mid: #be123c;
+      --crimson-soft: #fff1f2;
+      --gold: #ca8a04;
+      --gold-bright: #facc15;
+      --ink: #0c1222;
+      --ink-2: #1e293b;
+      --slate: #64748b;
+      --slate-light: #94a3b8;
+      --cloud: #f1f5f9;
+      --line: #e2e8f0;
+      --white: #ffffff;
+      --green: #16a34a;
+      --green-soft: #f0fdf4;
+      --blue: #2563eb;
+      --blue-soft: #eff6ff;
+      --orange: #ea580c;
+      --orange-soft: #fff7ed;
+      --purple: #7c3aed;
+      --purple-soft: #f5f3ff;
+      --sidebar-w: 260px;
+      --r: 12px;
+      --sh: 0 1px 3px rgba(12,18,34,0.04), 0 4px 12px rgba(12,18,34,0.04);
+      --sh-md: 0 4px 6px rgba(12,18,34,0.05), 0 10px 24px rgba(12,18,34,0.06);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--cloud);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    table { border-collapse: collapse; width: 100%; }
+
+    /* ── LAYOUT ── */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--ink);
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform 0.35s var(--ease);
+    }
+    .sidebar-brand {
+      display: flex; align-items: center; gap: 12px;
+      padding: 22px 22px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-logo {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(145deg, var(--crimson-mid), var(--crimson-deep));
+      display: grid; place-items: center; font-size: 1.1rem;
+      box-shadow: 0 2px 10px rgba(159,18,57,0.4);
+      flex-shrink: 0;
+    }
+    .sidebar-name {
+      font-weight: 800; font-size: 1rem; color: #fff;
+      letter-spacing: -0.03em; line-height: 1.2;
+    }
+    .sidebar-name span { color: var(--gold-bright); }
+    .sidebar-sub {
+      font-size: 0.7rem; color: #64748b; font-weight: 500;
+    }
+    .sidebar-nav {
+      flex: 1; padding: 16px 12px; overflow-y: auto;
+    }
+    .nav-label {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #475569;
+      padding: 8px 12px 6px; margin-top: 8px;
+    }
+    
+    .nav-item {
+      display: flex; align-items: center; gap: 11px;
+      padding: 10px 14px; border-radius: 10px;
+      font-size: 0.875rem; font-weight: 500; color: #94a3b8;
+      transition: all 0.2s; margin-bottom: 2px; cursor: pointer;
+      width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: #e2e8f0; }
+    .nav-item.active {
+      background: rgba(159,18,57,0.25); color: #fff;
+      font-weight: 600;
+    }
+    .nav-item.active svg { color: var(--gold-bright); }
+    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.8; }
+    .sidebar-foot {
+      padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.75rem; color: #475569;
+    }
+    .sidebar-foot a {
+      color: var(--gold-bright); font-weight: 600;
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-top: 6px;
+    }
+    .sidebar-foot a:hover { text-decoration: underline; }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1; margin-left: var(--sidebar-w);
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--line);
+      padding: 0 28px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-left {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .menu-toggle {
+      display: none; width: 36px; height: 36px; border-radius: 8px;
+      align-items: center; justify-content: center;
+      color: var(--ink); transition: background 0.2s;
+    }
+    .menu-toggle:hover { background: var(--cloud); }
+    .page-title {
+      font-size: 1.05rem; font-weight: 700; letter-spacing: -0.02em;
+    }
+    .topbar-right {
+      display: flex; align-items: center; gap: 12px;
+    }
+    
+    .mainw{
+      font-size: medium; color: #0606d5;font-weight: 800;
+      background:none; border-radius: 5px;margin-right: 700px;
+    }
+
+    .date-badge {
+      font-size: 1rem; color: rgb(246, 245, 248); font-weight: 800;
+      background: rgb(227, 3, 3); ding: 100px 240px; border-radius: 5px;
+    }
+    .wa-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green); color: #fff;
+      font-weight: 600; font-size: 0.8rem;
+      padding: 8px 16px; border-radius: 999px;
+      box-shadow: 0 2px 8px rgba(22,163,74,0.3);
+      transition: transform 0.2s, background 0.2s;
+    }
+
+
+    
+    .wa-btn:hover { background: #15803d; transform: translateY(-1px); }
+
+    /* ── CONTENT ── */
+    .content {
+      flex: 1; padding: 28px;
+    }
+    .view { display: none; }
+    .view.active { display: block; animation: fadeIn 0.3s var(--ease); }
+
+    /* ── STATS ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--r); padding: 20px 22px;
+      box-shadow: var(--sh); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--sh-md); }
+    .stat-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: grid; place-items: center;
+    }
+    .stat-icon.red { background: var(--crimson-soft); color: var(--crimson); }
+    .stat-icon.green { background: var(--green-soft); color: var(--green); }
+    .stat-icon.blue { background: var(--blue-soft); color: var(--blue); }
+    .stat-icon.orange { background: var(--orange-soft); color: var(--orange); }
+    .stat-icon svg { width: 20px; height: 20px; }
+    .stat-label {
+      font-size: 0.78rem; font-weight: 500; color: var(--slate);
+    }
+    .stat-value {
+      font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em;
+      color: var(--ink); line-height: 1.2;
+    }
+    .stat-sub {
+      font-size: 0.75rem; color: var(--slate-light); margin-top: 4px;
+    }
+
+    /* ── CARDS / PANELS ── */
+    .panel {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--r); box-shadow: var(--sh);
+      margin-bottom: 24px; overflow: hidden;
+    }
+    .panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 22px; border-bottom: 1px solid var(--line);
+      flex-wrap: wrap; gap: 10px;
+    }
+    .panel-title {
+      font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em;
+    }
+    .panel-actions {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .panel-body { padding: 0; }
+    .panel-body.padded { padding: 22px; }
+
+    /* ── FILTERS ── */
+    .filter-tabs {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .filter-tab {
+      font-size: 0.8rem; font-weight: 600; color: var(--slate);
+      padding: 6px 14px; border-radius: 999px;
+      border: 1.5px solid var(--line); transition: all 0.2s;
+    }
+    .filter-tab:hover { border-color: #cbd5e1; color: var(--ink); }
+    .filter-tab.active {
+      background: var(--crimson); border-color: var(--crimson); color: #fff;
+    }
+    .search-box {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--cloud); border: 1px solid var(--line);
+      border-radius: 8px; padding: 7px 12px;
+    }
+    .search-box svg { width: 16px; height: 16px; color: var(--slate); flex-shrink: 0; }
+    .search-box input {
+      border: none; background: none; outline: none;
+      font-family: inherit; font-size: 0.85rem; color: var(--ink);
+      width: 160px;
+    }
+    .search-box input::placeholder { color: var(--slate-light); }
+
+    .change-price-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--crimson); color: #fff;
+      font-weight: 600; font-size: 0.8rem;
+      padding: 8px 14px; border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(159,18,57,0.25);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .change-price-btn:hover { background: var(--crimson-mid); transform: translateY(-1px); }
+
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(12,18,34,0.55); z-index: 200;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(12,18,34,0.2);
+      width: 100%; max-width: 420px; overflow: hidden;
+      animation: fadeIn 0.25s var(--ease);
+    }
+    .modal.wide { max-width: 720px; max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-head {
+      padding: 18px 22px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-head h3 { font-size: 1rem; font-weight: 700; }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: grid; place-items: center; color: var(--slate); font-size: 1.2rem;
+    }
+    .modal-close:hover { background: var(--cloud); color: var(--ink); }
+    .modal-body { padding: 22px; }
+    .modal.wide .modal-body { overflow-y: auto; flex: 1; padding: 0; }
+    .modal-foot {
+      padding: 14px 22px; border-top: 1px solid var(--line);
+      display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;
+    }
+    .modal-btn {
+      padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+    }
+    .modal-btn.primary { background: var(--crimson); color: #fff; }
+    .modal-btn.primary:hover { background: var(--crimson-mid); }
+    .modal-btn.ghost { background: var(--cloud); color: var(--ink); }
+    .modal-btn.ghost:hover { background: var(--line); }
+    .pwd-input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
+      border-radius: 10px; font-size: 1.1rem; font-weight: 600;
+      letter-spacing: 0.15em; text-align: center; outline: none; font-family: inherit;
+    }
+    .pwd-input:focus { border-color: var(--crimson); }
+    .pwd-error { color: var(--crimson); font-size: 0.8rem; font-weight: 500; margin-top: 10px; text-align: center; display: none; }
+    .pwd-error.show { display: block; }
+    .edit-tbl { width: 100%; }
+    .edit-tbl th {
+      text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--slate); padding: 12px 16px;
+      background: var(--cloud); border-bottom: 1px solid var(--line); position: sticky; top: 0;
+    }
+    .edit-tbl td { padding: 10px 16px; font-size: 0.875rem; border-bottom: 1px solid var(--line); }
+    .edit-price-input {
+      width: 100px; padding: 7px 10px; border: 1.5px solid var(--line);
+      border-radius: 7px; font-weight: 700; font-size: 0.9rem; color: var(--crimson);
+      outline: none; font-family: inherit; text-align: right;
+    }
+    .edit-price-input:focus { border-color: var(--crimson); background: var(--crimson-soft); }
+    .edit-cat-badge {
+      display: inline-block; font-size: 0.68rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 999px; background: var(--blue-soft); color: var(--blue);
+    }
+    .edit-cat-badge.ready { background: var(--purple-soft); color: var(--purple); }
+    .edit-cat-badge.marinated { background: var(--orange-soft); color: var(--orange); }
+    .save-toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--green); color: #fff; padding: 14px 24px; border-radius: 12px;
+      font-weight: 600; font-size: 0.85rem; box-shadow: 0 8px 24px rgba(22,163,74,0.35);
+      opacity: 0; pointer-events: none; transition: all 0.35s var(--ease); z-index: 300;
+      max-width: 90vw; text-align: center; line-height: 1.4;
+    }
+    .save-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── TABLE ── */
+    .tbl { width: 100%; }
+    .tbl th {
+      text-align: left; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--slate); padding: 12px 18px;
+      background: var(--cloud); border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .tbl td {
+      padding: 13px 18px; font-size: 0.875rem;
+      border-bottom: 1px solid var(--line); vertical-align: middle;
+    }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl tr:hover td { background: #fafbfc; }
+    .product-name { font-weight: 600; color: var(--ink); }
+    .product-unit { font-size: 0.75rem; color: var(--slate); }
+    .price-cell {
+      font-weight: 700; color: var(--crimson);
+      font-variant-numeric: tabular-nums;
+    }
+    .badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 600;
+      padding: 3px 10px; border-radius: 999px; letter-spacing: 0.02em;
+    }
+    .badge-fixed { background: var(--green-soft); color: var(--green); }
+    .badge-daily { background: var(--orange-soft); color: var(--orange); }
+    .badge-cat {
+      background: var(--blue-soft); color: var(--blue);
+    }
+    .badge-cat.ready { background: var(--purple-soft); color: var(--purple); }
+    .badge-cat.marinated { background: var(--orange-soft); color: var(--orange); }
+
+    /* ── BRANCHES GRID ── */
+    .branch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px; padding: 22px;
+    }
+    .branch-card {
+      background: var(--cloud); border: 1px solid var(--line);
+      border-radius: var(--r); padding: 22px 18px; text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .branch-card:hover { transform: translateY(-2px); box-shadow: var(--sh); background: var(--white); }
+    .branch-pin { font-size: 1.5rem; margin-bottom: 8px; }
+    .branch-card h3 {
+      font-size: 0.9rem; font-weight: 700; letter-spacing: 0.03em;
+    }
+    .branch-card p {
+      font-size: 0.75rem; color: var(--slate); margin-top: 4px;
+    }
+
+    /* ── ORDERS (placeholder) ── */
+    .empty-state {
+      text-align: center; padding: 48px 24px; color: var(--slate);
+    }
+    .empty-state svg {
+      width: 48px; height: 48px; margin: 0 auto 16px; opacity: 0.4;
+    }
+    .empty-state h3 {
+      font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 6px;
+    }
+    .empty-state p { font-size: 0.875rem; max-width: 320px; margin: 0 auto; }
+
+    /* ── QUICK INFO ── */
+    .info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .info-card {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--r); padding: 22px; box-shadow: var(--sh);
+    }
+    .info-card h3 {
+      font-size: 0.9rem; font-weight: 700; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .info-list { list-style: none; }
+    .info-list li {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--line);
+      font-size: 0.85rem;
+    }
+    .info-list li:last-child { border-bottom: none; }
+    .info-list .label { color: var(--slate); }
+    .info-list .val { font-weight: 600; color: var(--ink); }
+
+    /* ── OVERLAY ── */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(12,18,34,0.4); z-index: 90;
+    }
+    .overlay.show { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .menu-toggle { display: flex; }
+      .content { padding: 20px 16px; }
+      .topbar { padding: 0 16px; }
+      .stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .stat-value { font-size: 1.3rem; }
+      .tbl th, .tbl td { padding: 10px 12px; font-size: 0.8rem; }
+      .search-box input { width: 120px; }
+    }
+    @media (max-width: 480px) {
+      .stats { grid-template-columns: 1fr; }
+      .date-badge { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">🐔</div>
+        <div>
+          <div class="sidebar-name">STAR <span>CHICKEN</span></div>
+          <div class="sidebar-sub">Admin Dashboard</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main</div>
+        <button class="nav-item active" data-view="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Overview
+        </button>
+        <button class="nav-item" data-view="products">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          Products &amp; Prices
+        </button>
+        <button class="nav-item" data-view="orders">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path d="M9 14l2 2 4-4"/></svg>
+          Orders
+        </button>
+
+        <div class="nav-label">Business</div>
+        <button class="nav-item" data-view="branches">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Branches
+        </button>
+        <button class="nav-item" data-view="contact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          Contact Info
+        </button>
+
+        <div class="nav-label">Website</div>
+        <a class="nav-item" href="index.html" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open Main Website
+        </a>
+      </nav>
+      <div class="sidebar-foot">
+        STAR CHICKEN Admin
+        <br />
+        <a href="https://wa.me/923134110411" target="_blank" rel="noopener">
+          WhatsApp 0313-4110411 →
+        </a>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+  
+
+    <!-- MAIN -->
+
+    
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 class="page-title" id="pageTitle">Overview</h1>
+        </div>
+        
+        <div class="topbar-right">
+          
+          <span class="date-badge" id="dateBadge"></span>
+          <a href="https://wa.me/923134110411" target="_blank" rel="noopener" class="wa-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.85 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
+          </a>
+        </div>
+      </header>
+    
+        
+      <div class="content">
+
+        <!-- OVERVIEW -->
+        <div class="view active" id="view-overview">
+          <div class="stats">
+            <div class="stat-card">
+              <div class="stat-top">
+                <div class="stat-icon red">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </div>
+              </div>
+              <div class="stat-label">Total Products</div>
+              <div class="stat-value" id="statProducts">0</div>
+              <div class="stat-sub">Across all categories</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top">
+                <div class="stat-icon green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                </div>
+              </div>
+              <div class="stat-label">Avg. Price (Parts)</div>
+              <div class="stat-value" id="statAvg">—</div>
+              <div class="stat-sub">Chicken parts /kg</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top">
+                <div class="stat-icon blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+              </div>
+              <div class="stat-label">Branches</div>
+              <div class="stat-value">6</div>
+              <div class="stat-sub">Active locations</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top">
+                <div class="stat-icon orange">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+              </div>
+              <div class="stat-label">Marinated Items</div>
+              <div class="stat-value" id="statMarinated">0</div>
+              <div class="stat-sub">Prices change daily</div>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <h3>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--crimson)" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                Category Breakdown
+              </h3>
+              <ul class="info-list" id="catBreakdown"></ul>
+            </div>
+            <div class="info-card">
+              <h3>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--crimson)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                Price Highlights
+              </h3>
+              <ul class="info-list" id="priceHighlights"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div class="view" id="view-products">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">All Products &amp; Prices</div>
+              <div class="panel-actions">
+                <div class="filter-tabs" id="prodFilters">
+                  <button class="filter-tab active" data-filter="all">All</button>
+                  <button class="filter-tab" data-filter="fresh">Chicken Parts</button>
+                  <button class="filter-tab" data-filter="ready">Ready to Cook</button>
+                  <button class="filter-tab" data-filter="marinated">Marinated</button>
+                </div>
+                <div class="search-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" id="searchInput" placeholder="Search product…" />
+                </div>
+                <button class="change-price-btn" id="changePriceBtn" type="button">Change the Price</button>
+              </div>
+            </div>
+            <div class="panel-body" style="overflow-x:auto;">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Unit</th>
+                    <th>Price (Rs)</th>
+                    <th>Pricing</th>
+                  </tr>
+                </thead>
+                <tbody id="prodTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORDERS -->
+        <div class="view" id="view-orders">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">Orders</div>
+            </div>
+            <div class="panel-body">
+              <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path d="M9 14l2 2 4-4"/></svg>
+                <h3>Orders from main website</h3>
+                <p>Customers order through the main website click below 👇👇 <strong>main website</strong> later to track orders here.</p>
+                <a href="index.html" target="_blank" rel="noopener" class="wa-btn" style="margin-top:20px;display:inline-flex;">
+                  Main website
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BRANCHES -->
+        <div class="view" id="view-branches">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">All Branches (6)</div>
+            </div>
+            <div class="branch-grid">
+              <div class="branch-card">
+                <div class="branch-pin">📍</div>
+                <h3>PALM CITY</h3>
+                <p>Active branch</p>
+              </div>
+              <div class="branch-card">
+                <div class="branch-pin">📍</div>
+                <h3>KASUR</h3>
+                <p>Active branch</p>
+              </div>
+              <div class="branch-card">
+                <div class="branch-pin">📍</div>
+                <h3>GAJJUMATA</h3>
+                <p>Active branch</p>
+              </div>
+              <div class="branch-card">
+                <div class="branch-pin">📍</div>
+                <h3>MUSTAFABAD</h3>
+                 <p>Active branch</p>
+              </div>
+              <div class="branch-card">
+                <div class="branch-pin">📍</div>
+                <h3>GULSHAN RAVI</h3>
+                <p>Active branch</p>
+              </div>
+              <div class="branch-card">
+                <div class="branch-pin">📍</div>
+                <h3>MURGHZAR</h3>
+                <p>Active branch</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTACT -->
+        <div class="view" id="view-contact">
+          <div class="info-grid">
+            <div class="info-card">
+              <h3>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                WhatsApp Order Line
+              </h3>
+              <ul class="info-list">
+                <li>
+                  <span class="label">Number</span>
+                  <span class="val">0313-4110411</span>
+                </li>
+                <li>
+                  <span class="label">Link</span>
+                  <span class="val"><a href="https://wa.me/923134110411" target="_blank" rel="noopener" style="color:var(--green);">wa.me/923134110411</a></span>
+                </li>
+                <li>
+                  <span class="label">Purpose</span>
+                  <span class="val">Customer orders &amp; queries</span>
+                </li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <h3>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--crimson)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Business Info
+              </h3>
+              <ul class="info-list">
+                <li>
+                  <span class="label">Brand</span>
+                  <span class="val">STAR CHICKEN</span>
+                </li>
+                <li>
+                  <span class="label">Tagline</span>
+                  <span class="val">Fresh · Hygienic · Premium</span>
+                </li>
+                <li>
+                  <span class="label">Delivery</span>
+                  <span class="val">Daily Fresh · Cold Chain</span>
+                </li>
+                <li>
+                  <span class="label">Price List Date</span>
+                  <span class="val">28 July 2026</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Password Modal -->
+  <div class="modal-backdrop" id="pwdModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>🔒 Enter Password</h3>
+        <button class="modal-close" id="pwdClose" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.875rem;color:var(--slate);margin-bottom:14px;text-align:center;">Enter admin password to edit product prices.</p>
+        <input type="password" class="pwd-input" id="pwdInput" placeholder="••••" maxlength="8" autocomplete="off" />
+        <div class="pwd-error" id="pwdError">Incorrect password. Try again.</div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" id="pwdCancel" type="button">Cancel</button>
+        <button class="modal-btn primary" id="pwdSubmit" type="button">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Price Edit Modal -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal wide">
+      <div class="modal-head">
+        <h3>✏️ Edit Product Prices</h3>
+        <button class="modal-close" id="editClose" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="edit-tbl">
+          <thead>
+            <tr><th>#</th><th>Product</th><th>Category</th><th>Unit</th><th>Price (Rs)</th></tr>
+          </thead>
+          <tbody id="editTableBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" id="editCancel" type="button">Cancel</button>
+        <button class="modal-btn primary" id="editSave" type="button">Save Prices</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="save-toast" id="saveToast">✓ Prices saved</div>
+
+  <!-- Shared price data – BOTH pages load this file -->
+  <script src="products-data.js"></script>
+
+  <script>
+    // ═══ PRODUCT DATA (linked with index.html via products-data.js) ═══
+    const DEFAULT_PRODUCTS = {
+      fresh: [
+        { name: "Skin", price: 120, unit: "/kg" },
+        { name: "Shank", price: 70, unit: "/kg" },
+        { name: "Neck", price: 170, unit: "/kg" },
+        { name: "Heart", price: 150, unit: "/kg" },
+        { name: "Gizzard", price: 230, unit: "/kg" },
+        { name: "Tail", price: 500, unit: "/kg" },
+        { name: "Wing Tip", price: 70, unit: "/kg" },
+        { name: "Liver", price: 230, unit: "/kg" },
+        { name: "Carcass", price: 100, unit: "/kg" },
+        { name: "Thigh Trimming", price: 450, unit: "/kg" },
+        { name: "Trimming+Bone", price: 220, unit: "/kg" },
+        { name: "Trimming B", price: 500, unit: "/kg" },
+        { name: "Niblet A", price: 625, unit: "/kg" },
+        { name: "Niblet B", price: 400, unit: "/kg" },
+        { name: "Drummet A", price: 400, unit: "/kg" },
+        { name: "Drummet B", price: 300, unit: "/kg" },
+        { name: "Mince (Eco)", price: 220, unit: "/kg" },
+        { name: "2 Joined Wings Skinless", price: 250, unit: "/kg" },
+        { name: "Inner Fillet", price: 600, unit: "/kg" },
+        { name: "Slice Trimming A", price: 600, unit: "/kg" },
+        { name: "Drumsticks", price: 550, unit: "/kg" },
+        { name: "Karahi Cut", price: 600, unit: "/kg" },
+        { name: "Whole Birds", price: 600, unit: "/kg" },
+        { name: "Zinger S/L (Eco)", price: 750, unit: "/kg" },
+        { name: "Zinger S/O (Eco)", price: 770, unit: "/kg" },
+        { name: "Breast Fillet Standard", price: 850, unit: "/kg" },
+        { name: "Breast Boneless", price: 800, unit: "/kg" },
+        { name: "9 Cut Chicken", price: 650, unit: "/kg" }
+      ],
+      ready: [
+        { name: "Nuggets", price: 800, unit: "/1 KG" },
+        { name: "Burger Patty (08 pcs)", price: 450, unit: "/pack" },
+        { name: "Burger Patty (12 pcs)", price: 650, unit: "/pack" },
+        { name: "Chicken Kofta", price: 630, unit: "/1 KG" },
+        { name: "Chicken Fries", price: 1000, unit: "/1 KG" },
+        { name: "Chicken Samosa (Premium) 12pcs", price: 200, unit: "/12 pcs" },
+        { name: "Chicken Spring Roll (Premium) 12pcs", price: 200, unit: "/12 pcs" },
+        { name: "Chicken Samosa (Premium) 24pcs", price: 400, unit: "/24 pcs" },
+        { name: "Chicken Spring Roll (Premium) 24pcs", price: 400, unit: "/24 pcs" },
+        { name: "Kebab", price: 600, unit: "/0.5 kg" }
+      ],
+      marinated: [
+        { name: "Marinated Wings", price: 700, unit: "/kg", daily: true },
+        { name: "Marinated Drumstick", price: 700, unit: "/kg", daily: true },
+        { name: "Marinated Zinger", price: 1000, unit: "/kg", daily: true },
+        { name: "Marinated Butterfly", price: 1000, unit: "/kg", daily: true },
+        { name: "Injected Broast", price: 800, unit: "/kg", daily: true }
+      ]
+    };
+
+    // Use shared file if available, else defaults
+    let PRODUCTS = JSON.parse(JSON.stringify(
+      (typeof window.SC_PRODUCTS !== "undefined" && window.SC_PRODUCTS) ? window.SC_PRODUCTS : DEFAULT_PRODUCTS
+    ));
+
+    const CAT_LABELS = {
+      fresh: "Chicken Parts",
+      ready: "Ready to Cook",
+      marinated: "Marinated"
+    };
+
+    // Flatten for table
+    function allProducts() {
+      const list = [];
+      Object.keys(PRODUCTS).forEach(cat => {
+        PRODUCTS[cat].forEach(p => list.push({ ...p, category: cat }));
+      });
+      return list;
+    }
+
+    // ═══ OVERVIEW STATS ═══
+    function loadOverview() {
+      const all = allProducts();
+      document.getElementById("statProducts").textContent = all.length;
+      document.getElementById("statMarinated").textContent = PRODUCTS.marinated.length;
+
+      const parts = PRODUCTS.fresh;
+      const avg = Math.round(parts.reduce((s, p) => s + p.price, 0) / parts.length);
+      document.getElementById("statAvg").textContent = "Rs " + avg.toLocaleString();
+
+      // Category breakdown
+      const br = document.getElementById("catBreakdown");
+      br.innerHTML = Object.keys(PRODUCTS).map(cat => `
+        <li>
+          <span class="label">${CAT_LABELS[cat]}</span>
+          <span class="val">${PRODUCTS[cat].length} items</span>
+        </li>
+      `).join("");
+
+      // Price highlights
+      const sorted = [...parts].sort((a, b) => b.price - a.price);
+      const hi = document.getElementById("priceHighlights");
+      hi.innerHTML = `
+        <li><span class="label">Highest (Parts)</span><span class="val">${sorted[0].name} — Rs ${sorted[0].price}</span></li>
+        <li><span class="label">Lowest (Parts)</span><span class="val">${sorted[sorted.length-1].name} — Rs ${sorted[sorted.length-1].price}</span></li>
+        <li><span class="label">Nuggets</span><span class="val">Rs 800 / 1 KG</span></li>
+        <li><span class="label">Chicken Fries</span><span class="val">Rs 1,000 / 1 KG</span></li>
+        <li><span class="label">Marinated Zinger</span><span class="val">Rs 927 /kg (daily)</span></li>
+      `;
+    }
+
+    // ═══ PRODUCTS TABLE ═══
+    let currentFilter = "all";
+    let searchQuery = "";
+
+    function renderTable() {
+      let list = allProducts();
+      if (currentFilter !== "all") {
+        list = list.filter(p => p.category === currentFilter);
+      }
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        list = list.filter(p => p.name.toLowerCase().includes(q));
+      }
+
+      const tbody = document.getElementById("prodTable");
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--slate);">No products found</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map((p, i) => `
+        <tr>
+          <td style="color:var(--slate);font-variant-numeric:tabular-nums;">${i + 1}</td>
+          <td>
+            <div class="product-name">${p.name}</div>
+          </td>
+          <td><span class="badge badge-cat ${p.category}">${CAT_LABELS[p.category]}</span></td>
+          <td class="product-unit">${p.unit}</td>
+          <td class="price-cell">Rs ${p.price.toLocaleString()}</td>
+          <td>
+            ${p.daily
+              ? '<span class="badge badge-daily">Daily change</span>'
+              : '<span class="badge badge-fixed">Fixed</span>'}
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    // Filter tabs
+    document.getElementById("prodFilters").addEventListener("click", e => {
+      const btn = e.target.closest(".filter-tab");
+      if (!btn) return;
+      document.querySelectorAll("#prodFilters .filter-tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = btn.dataset.filter;
+      renderTable();
+    });
+
+    // Search
+    document.getElementById("searchInput").addEventListener("input", e => {
+      searchQuery = e.target.value.trim();
+      renderTable();
+    });
+
+    // ═══ NAVIGATION ═══
+    const titles = {
+      overview: "Overview",
+      products: "Products & Prices",
+      orders: "Orders",
+      branches: "Branches",
+      contact: "Contact Info"
+    };
+
+    document.querySelectorAll(".nav-item[data-view]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const view = btn.dataset.view;
+
+        document.querySelectorAll(".nav-item[data-view]").forEach(n => n.classList.remove("active"));
+        btn.classList.add("active");
+
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        document.getElementById("view-" + view).classList.add("active");
+
+        document.getElementById("pageTitle").textContent = titles[view] || view;
+
+        // Close mobile sidebar
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("overlay").classList.remove("show");
+      });
+    });
+
+    // Mobile menu
+    document.getElementById("menuToggle").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("open");
+      document.getElementById("overlay").classList.toggle("show");
+    });
+    document.getElementById("overlay").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.remove("open");
+      document.getElementById("overlay").classList.remove("show");
+    });
+
+    // Date
+    const now = new Date();
+    const opts = { weekday: "short", year: "numeric", month: "short", day: "numeric" };
+    document.getElementById("dateBadge").textContent = now.toLocaleDateString("en-PK", opts);
+
+    // ═══ CHANGE PRICE (password 8627) ═══
+    const PWD = "8627";
+    const pwdModal = document.getElementById("pwdModal");
+    const editModal = document.getElementById("editModal");
+    const pwdInput = document.getElementById("pwdInput");
+    const pwdError = document.getElementById("pwdError");
+
+    document.getElementById("changePriceBtn").addEventListener("click", () => {
+      pwdInput.value = "";
+      pwdError.classList.remove("show");
+      pwdModal.classList.add("show");
+      setTimeout(() => pwdInput.focus(), 50);
+    });
+
+    function closePwd() { pwdModal.classList.remove("show"); }
+    document.getElementById("pwdClose").addEventListener("click", closePwd);
+    document.getElementById("pwdCancel").addEventListener("click", closePwd);
+    pwdModal.addEventListener("click", e => { if (e.target === pwdModal) closePwd(); });
+
+    function openEditModal() {
+      closePwd();
+      const list = allProducts();
+      document.getElementById("editTableBody").innerHTML = list.map((p, i) => `
+        <tr>
+          <td style="color:var(--slate);">${i + 1}</td>
+          <td style="font-weight:600;">${p.name}</td>
+          <td><span class="edit-cat-badge ${p.category}">${CAT_LABELS[p.category]}</span></td>
+          <td style="color:var(--slate);font-size:0.8rem;">${p.unit}</td>
+          <td>
+            <input type="number" class="edit-price-input" data-cat="${p.category}" data-name="${p.name}"
+                   value="${p.price}" min="1" step="1" />
+          </td>
+        </tr>
+      `).join("");
+      editModal.classList.add("show");
+    }
+
+    document.getElementById("pwdSubmit").addEventListener("click", () => {
+      if (pwdInput.value === PWD) openEditModal();
+      else { pwdError.classList.add("show"); pwdInput.value = ""; pwdInput.focus(); }
+    });
+    pwdInput.addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("pwdSubmit").click(); });
+
+    function closeEdit() { editModal.classList.remove("show"); }
+    document.getElementById("editClose").addEventListener("click", closeEdit);
+    document.getElementById("editCancel").addEventListener("click", closeEdit);
+    editModal.addEventListener("click", e => { if (e.target === editModal) closeEdit(); });
+
+    function downloadProductsDataFile() {
+      const data = JSON.stringify(PRODUCTS, null, 2);
+      const content = `// STAR CHICKEN – Shared product prices
+// Generated from Admin Dashboard – ${new Date().toLocaleString("en-PK")}
+// Upload this file to the SAME folder as index.html & dashboard.html
+// so ALL visitors see the updated prices.
+
+window.SC_PRODUCTS = ${data};
+`;
+      const blob = new Blob([content], { type: "application/javascript" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "products-data.js";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("editSave").addEventListener("click", () => {
+      document.querySelectorAll(".edit-price-input").forEach(inp => {
+        const val = parseInt(inp.value, 10);
+        if (!isNaN(val) && val > 0) {
+          const item = PRODUCTS[inp.dataset.cat].find(p => p.name === inp.dataset.name);
+          if (item) item.price = val;
+        }
+      });
+      // Keep shared object in sync for this session
+      window.SC_PRODUCTS = PRODUCTS;
+      loadOverview();
+      renderTable();
+      closeEdit();
+      downloadProductsDataFile();
+      const toast = document.getElementById("saveToast");
+      toast.textContent = "✓ Prices saved — products-data.js downloaded. Upload it to your website folder so ALL customers see the new prices.";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 7000);
+    });
+
+    // Init
+    loadOverview();
+    renderTable();
+  </script>
+</body>
+</html>
