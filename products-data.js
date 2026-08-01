@@ -1,5 +1,5 @@
 // STAR CHICKEN – Shared product prices
-// Generated from Admin Dashboard – 01/08/2026, 2:44:20 pm
+// Generated from Admin Dashboard – 31/07/2026, 12:33:52 pm
 // Upload this file to the SAME folder as index.html & dashboard.html
 // so ALL visitors see the updated prices.
 
@@ -201,31 +201,31 @@ window.SC_PRODUCTS = {
   "marinated": [
     {
       "name": "Marinated Wings",
-      "price": 593,
+      "price": 568,
       "unit": "/kg",
       "daily": true
     },
     {
       "name": "Marinated Drumstick",
-      "price": 593,
+      "price": 568,
       "unit": "/kg",
       "daily": true
     },
     {
       "name": "Marinated Zinger",
-      "price": 936,
+      "price": 897,
       "unit": "/kg",
       "daily": true
     },
     {
       "name": "Marinated Butterfly",
-      "price": 874,
+      "price": 837,
       "unit": "/kg",
       "daily": true
     },
     {
       "name": "Injected Broast",
-      "price": 686,
+      "price": 658,
       "unit": "/kg",
       "daily": true
     }
