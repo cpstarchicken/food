@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"  />
   <title>STAR CHICKEN </title>
-   <link rel="icon" href="https://scontent.flhe1-2.fna.fbcdn.net/v/t39.30808-6/759835425_122102886003415980_5257241594298963736_n.jpg?stp=dst-jpg_tt6&cstp=mx1024x1024&ctp=s1024x1024&_nc_cat=108&ccb=1-7&_nc_sid=f727a1&_nc_ohc=j_xJqFScqTEQ7kNvwECETTt&_nc_oc=Adqu3AyGmspJS0PV5FTSTTk24X4yTVQ61D6B4xZEHdu5MgMTOrmW9H_kDzqzFF4uKvA&_nc_zt=23&_nc_ht=scontent.flhe1-2.fna&_nc_gid=ZBYOUd6232hU0aJod1AM6Q&_nc_ss=7b2a8&oh=00_AQHB5IwfWswXhj9rcddaHhV-wT7WAJj8GPDyoKRvhyIeVQ&oe=6A75F4FF" type="image/webp">
   <meta name="description" content="STAR CHICKEN Admin Dashboard — Manage products, prices, orders and branches." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -265,6 +264,88 @@
       width: 160px;
     }
     .search-box input::placeholder { color: var(--slate-light); }
+
+    .change-price-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--crimson); color: #fff;
+      font-weight: 600; font-size: 0.8rem;
+      padding: 8px 14px; border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(159,18,57,0.25);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .change-price-btn:hover { background: var(--crimson-mid); transform: translateY(-1px); }
+
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(12,18,34,0.55); z-index: 200;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(12,18,34,0.2);
+      width: 100%; max-width: 420px; overflow: hidden;
+      animation: fadeIn 0.25s var(--ease);
+    }
+    .modal.wide { max-width: 720px; max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-head {
+      padding: 18px 22px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-head h3 { font-size: 1rem; font-weight: 700; }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: grid; place-items: center; color: var(--slate); font-size: 1.2rem;
+    }
+    .modal-close:hover { background: var(--cloud); color: var(--ink); }
+    .modal-body { padding: 22px; }
+    .modal.wide .modal-body { overflow-y: auto; flex: 1; padding: 0; }
+    .modal-foot {
+      padding: 14px 22px; border-top: 1px solid var(--line);
+      display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;
+    }
+    .modal-btn {
+      padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+    }
+    .modal-btn.primary { background: var(--crimson); color: #fff; }
+    .modal-btn.primary:hover { background: var(--crimson-mid); }
+    .modal-btn.ghost { background: var(--cloud); color: var(--ink); }
+    .modal-btn.ghost:hover { background: var(--line); }
+    .pwd-input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
+      border-radius: 10px; font-size: 1.1rem; font-weight: 600;
+      letter-spacing: 0.15em; text-align: center; outline: none; font-family: inherit;
+    }
+    .pwd-input:focus { border-color: var(--crimson); }
+    .pwd-error { color: var(--crimson); font-size: 0.8rem; font-weight: 500; margin-top: 10px; text-align: center; display: none; }
+    .pwd-error.show { display: block; }
+    .edit-tbl { width: 100%; }
+    .edit-tbl th {
+      text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--slate); padding: 12px 16px;
+      background: var(--cloud); border-bottom: 1px solid var(--line); position: sticky; top: 0;
+    }
+    .edit-tbl td { padding: 10px 16px; font-size: 0.875rem; border-bottom: 1px solid var(--line); }
+    .edit-price-input {
+      width: 100px; padding: 7px 10px; border: 1.5px solid var(--line);
+      border-radius: 7px; font-weight: 700; font-size: 0.9rem; color: var(--crimson);
+      outline: none; font-family: inherit; text-align: right;
+    }
+    .edit-price-input:focus { border-color: var(--crimson); background: var(--crimson-soft); }
+    .edit-cat-badge {
+      display: inline-block; font-size: 0.68rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 999px; background: var(--blue-soft); color: var(--blue);
+    }
+    .edit-cat-badge.ready { background: var(--purple-soft); color: var(--purple); }
+    .edit-cat-badge.marinated { background: var(--orange-soft); color: var(--orange); }
+    .save-toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--green); color: #fff; padding: 14px 24px; border-radius: 12px;
+      font-weight: 600; font-size: 0.85rem; box-shadow: 0 8px 24px rgba(22,163,74,0.35);
+      opacity: 0; pointer-events: none; transition: all 0.35s var(--ease); z-index: 300;
+      max-width: 90vw; text-align: center; line-height: 1.4;
+    }
+    .save-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* ── TABLE ── */
     .tbl { width: 100%; }
@@ -550,6 +631,7 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                   <input type="text" id="searchInput" placeholder="Search product…" />
                 </div>
+                <button class="change-price-btn" id="changePriceBtn" type="button">Change the Price</button>
               </div>
             </div>
             <div class="panel-body" style="overflow-x:auto;">
@@ -614,7 +696,7 @@
               <div class="branch-card">
                 <div class="branch-pin">📍</div>
                 <h3>MUSTAFABAD</h3>
-                <p>Active branch</p>
+                 <p>Active branch</p>
               </div>
               <div class="branch-card">
                 <div class="branch-pin">📍</div>
@@ -684,9 +766,55 @@
     </div>
   </div>
 
+  <!-- Password Modal -->
+  <div class="modal-backdrop" id="pwdModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>🔒 Enter Password</h3>
+        <button class="modal-close" id="pwdClose" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.875rem;color:var(--slate);margin-bottom:14px;text-align:center;">Enter admin password to edit product prices.</p>
+        <input type="password" class="pwd-input" id="pwdInput" placeholder="••••" maxlength="8" autocomplete="off" />
+        <div class="pwd-error" id="pwdError">Incorrect password. Try again.</div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" id="pwdCancel" type="button">Cancel</button>
+        <button class="modal-btn primary" id="pwdSubmit" type="button">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Price Edit Modal -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal wide">
+      <div class="modal-head">
+        <h3>✏️ Edit Product Prices</h3>
+        <button class="modal-close" id="editClose" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="edit-tbl">
+          <thead>
+            <tr><th>#</th><th>Product</th><th>Category</th><th>Unit</th><th>Price (Rs)</th></tr>
+          </thead>
+          <tbody id="editTableBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" id="editCancel" type="button">Cancel</button>
+        <button class="modal-btn primary" id="editSave" type="button">Save Prices</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="save-toast" id="saveToast">✓ Prices saved</div>
+
+  <!-- Shared price data – BOTH pages load this file -->
+  <script src="products-data.js"></script>
+
   <script>
-    // ═══ PRODUCT DATA (same as main website) ═══
-    const PRODUCTS = {
+    // ═══ PRODUCT DATA (linked with index.html via products-data.js) ═══
+    const DEFAULT_PRODUCTS = {
       fresh: [
         { name: "Skin", price: 120, unit: "/kg" },
         { name: "Shank", price: 70, unit: "/kg" },
@@ -723,10 +851,11 @@
         { name: "Burger Patty (12 pcs)", price: 650, unit: "/pack" },
         { name: "Chicken Kofta", price: 630, unit: "/1 KG" },
         { name: "Chicken Fries", price: 1000, unit: "/1 KG" },
-        { name: "Chicken Samosa (Premium)", price: 200, unit: "/12 pcs" },
-        { name: "Chicken Spring Roll (Premium)", price: 200, unit: "/12 pcs" },
-        { name: "Chicken Samosa (Premium)", price: 400, unit: "/24 pcs" },
-        { name: "Chicken Spring Roll (Premium)", price: 400, unit: "/24 pcs" }
+        { name: "Chicken Samosa (Premium) 12pcs", price: 200, unit: "/12 pcs" },
+        { name: "Chicken Spring Roll (Premium) 12pcs", price: 200, unit: "/12 pcs" },
+        { name: "Chicken Samosa (Premium) 24pcs", price: 400, unit: "/24 pcs" },
+        { name: "Chicken Spring Roll (Premium) 24pcs", price: 400, unit: "/24 pcs" },
+        { name: "Kebab", price: 600, unit: "/0.5 kg" }
       ],
       marinated: [
         { name: "Marinated Wings", price: 700, unit: "/kg", daily: true },
@@ -736,6 +865,11 @@
         { name: "Injected Broast", price: 800, unit: "/kg", daily: true }
       ]
     };
+
+    // Use shared file if available, else defaults
+    let PRODUCTS = JSON.parse(JSON.stringify(
+      (typeof window.SC_PRODUCTS !== "undefined" && window.SC_PRODUCTS) ? window.SC_PRODUCTS : DEFAULT_PRODUCTS
+    ));
 
     const CAT_LABELS = {
       fresh: "Chicken Parts",
@@ -878,6 +1012,94 @@
     const now = new Date();
     const opts = { weekday: "short", year: "numeric", month: "short", day: "numeric" };
     document.getElementById("dateBadge").textContent = now.toLocaleDateString("en-PK", opts);
+
+    // ═══ CHANGE PRICE (password 8627) ═══
+    const PWD = "8627";
+    const pwdModal = document.getElementById("pwdModal");
+    const editModal = document.getElementById("editModal");
+    const pwdInput = document.getElementById("pwdInput");
+    const pwdError = document.getElementById("pwdError");
+
+    document.getElementById("changePriceBtn").addEventListener("click", () => {
+      pwdInput.value = "";
+      pwdError.classList.remove("show");
+      pwdModal.classList.add("show");
+      setTimeout(() => pwdInput.focus(), 50);
+    });
+
+    function closePwd() { pwdModal.classList.remove("show"); }
+    document.getElementById("pwdClose").addEventListener("click", closePwd);
+    document.getElementById("pwdCancel").addEventListener("click", closePwd);
+    pwdModal.addEventListener("click", e => { if (e.target === pwdModal) closePwd(); });
+
+    function openEditModal() {
+      closePwd();
+      const list = allProducts();
+      document.getElementById("editTableBody").innerHTML = list.map((p, i) => `
+        <tr>
+          <td style="color:var(--slate);">${i + 1}</td>
+          <td style="font-weight:600;">${p.name}</td>
+          <td><span class="edit-cat-badge ${p.category}">${CAT_LABELS[p.category]}</span></td>
+          <td style="color:var(--slate);font-size:0.8rem;">${p.unit}</td>
+          <td>
+            <input type="number" class="edit-price-input" data-cat="${p.category}" data-name="${p.name}"
+                   value="${p.price}" min="1" step="1" />
+          </td>
+        </tr>
+      `).join("");
+      editModal.classList.add("show");
+    }
+
+    document.getElementById("pwdSubmit").addEventListener("click", () => {
+      if (pwdInput.value === PWD) openEditModal();
+      else { pwdError.classList.add("show"); pwdInput.value = ""; pwdInput.focus(); }
+    });
+    pwdInput.addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("pwdSubmit").click(); });
+
+    function closeEdit() { editModal.classList.remove("show"); }
+    document.getElementById("editClose").addEventListener("click", closeEdit);
+    document.getElementById("editCancel").addEventListener("click", closeEdit);
+    editModal.addEventListener("click", e => { if (e.target === editModal) closeEdit(); });
+
+    function downloadProductsDataFile() {
+      const data = JSON.stringify(PRODUCTS, null, 2);
+      const content = `// STAR CHICKEN – Shared product prices
+// Generated from Admin Dashboard – ${new Date().toLocaleString("en-PK")}
+// Upload this file to the SAME folder as index.html & dashboard.html
+// so ALL visitors see the updated prices.
+
+window.SC_PRODUCTS = ${data};
+`;
+      const blob = new Blob([content], { type: "application/javascript" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "products-data.js";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("editSave").addEventListener("click", () => {
+      document.querySelectorAll(".edit-price-input").forEach(inp => {
+        const val = parseInt(inp.value, 10);
+        if (!isNaN(val) && val > 0) {
+          const item = PRODUCTS[inp.dataset.cat].find(p => p.name === inp.dataset.name);
+          if (item) item.price = val;
+        }
+      });
+      // Keep shared object in sync for this session
+      window.SC_PRODUCTS = PRODUCTS;
+      loadOverview();
+      renderTable();
+      closeEdit();
+      downloadProductsDataFile();
+      const toast = document.getElementById("saveToast");
+      toast.textContent = "✓ Prices saved — products-data.js downloaded. Upload it to your website folder so ALL customers see the new prices.";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 7000);
+    });
 
     // Init
     loadOverview();
