@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Chicken • Billing Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e63946;
+            --primary-dark: #c1121f;
+            --secondary: #f4a261;
+            --accent: #ffb703;
+            --dark: #1d1d1d;
+            --darker: #121212;
+            --card-bg: #1f1f1f;
+            --text: #f8f9fa;
+            --muted: #adb5bd;
+            --success: #2a9d8f;
+            --border: #333;
+            --shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(145deg, #0f0f0f 0%, #1a1a1a 50%, #121212 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, #1a1a1a, #222);
+            border-bottom: 3px solid var(--primary);
+            padding: 18px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-icon {
+            width: 58px;
+            height: 58px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '★';
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            font-size: 16px;
+            color: var(--accent);
+            text-shadow: 0 0 8px var(--accent);
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #fff, var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        .brand span {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .header-right .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(42, 157, 143, 0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .section-title h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .section-title p {
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        /* Branch Grid */
+        .branches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .branch-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+
+        .branch-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: 0 16px 40px rgba(230, 57, 70, 0.2);
+        }
+
+        .branch-card.unlocked {
+            border-color: var(--success);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+            padding: 22px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .branch-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .branch-name .pin {
+            font-size: 20px;
+        }
+
+        .lock-badge {
+            background: rgba(230, 57, 70, 0.15);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .branch-card.unlocked .lock-badge {
+            background: rgba(42, 157, 143, 0.15);
+            color: var(--success);
+        }
+
+        .card-body {
+            padding: 28px 24px;
+        }
+
+        .pin-section {
+            text-align: center;
+        }
+
+        .pin-section p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .pin-input-wrap {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .pin-digit {
+            width: 52px;
+            height: 56px;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            outline: none;
+            transition: all 0.2s;
+            caret-color: var(--primary);
+        }
+
+        .pin-digit:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.25);
+        }
+
+        .pin-digit.filled {
+            border-color: var(--secondary);
+            background: #332a20;
+        }
+
+        .unlock-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .unlock-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
+        }
+
+        .unlock-btn:active {
+            transform: scale(0.98);
+        }
+
+        .error-msg {
+            color: var(--primary);
+            font-size: 13px;
+            margin-top: 12px;
+            min-height: 20px;
+            font-weight: 500;
+        }
+
+        /* Unlocked state */
+        .unlocked-content {
+            display: none;
+            text-align: center;
+        }
+
+        .branch-card.unlocked .pin-section {
+            display: none;
+        }
+
+        .branch-card.unlocked .unlocked-content {
+            display: block;
+        }
+
+        .unlocked-content .success-icon {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .unlocked-content h3 {
+            font-size: 18px;
+            margin-bottom: 6px;
+            color: var(--success);
+        }
+
+        .unlocked-content p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .enter-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--success), #21867a);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .enter-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(42, 157, 143, 0.4);
+        }
+
+        /* Billing Modal / Screen */
+        .billing-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .billing-overlay.active {
+            display: flex;
+        }
+
+        .billing-panel {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 920px;
+            max-height: 92vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            animation: slideUp 0.35s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .billing-header {
+            background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .billing-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-billing {
+            background: #333;
+            border: none;
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .close-billing:hover {
+            background: var(--primary);
+        }
+
+        .billing-body {
+            padding: 28px;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 28px;
+        }
+
+        @media (max-width: 768px) {
+            .billing-body {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                padding: 14px 20px;
+            }
+            .brand h1 {
+                font-size: 20px;
+            }
+        }
+
+        /* Menu Items */
+        .menu-section h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .menu-item {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            padding: 14px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-item:hover {
+            border-color: var(--primary);
+            background: #322a2a;
+            transform: translateY(-2px);
+        }
+
+        .menu-item .item-emoji {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .menu-item .item-name {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .menu-item .item-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* Cart */
+        .cart-section {
+            background: #252525;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+
+        .cart-section h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-items {
+            flex: 1;
+            min-height: 120px;
+            max-height: 280px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+            font-size: 13px;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 500;
+        }
+
+        .cart-item-qty {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .cart-item-price {
+            font-weight: 600;
+            color: var(--accent);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 8px;
+            opacity: 0.7;
+        }
+
+        .cart-item-remove:hover {
+            opacity: 1;
+        }
+
+        .cart-empty {
+            text-align: center;
+            color: var(--muted);
+            padding: 30px 0;
+            font-size: 14px;
+        }
+
+        .cart-totals {
+            border-top: 1px solid #444;
+            padding-top: 14px;
+            margin-bottom: 16px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .total-row.grand {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-top: 8px;
+        }
+
+        .customer-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 12px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .customer-input:focus {
+            border-color: var(--primary);
+        }
+
+        .action-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-print {
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-print:hover {
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+        }
+
+        .btn-clear {
+            padding: 14px;
+            background: #333;
+            color: var(--text);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: #444;
+        }
+
+        /* Receipt Preview (hidden, for print) */
+        #receipt-print {
+            display: none;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #receipt-print, #receipt-print * {
+                visibility: visible;
+            }
+            #receipt-print {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                color: black;
+                padding: 20px;
+                font-family: monospace;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--muted);
+            font-size: 13px;
+            border-top: 1px solid #222;
+            margin-top: 20px;
+        }
+
+        .footer span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-area">
+            <img src="logo1.jpg" alt="STAR CHICKEN" style="height:52px;width:auto;border-radius:8px;box-shadow:0 4px 12px rgba(230,57,70,0.35);">
+            <div class="brand">
+                <h1>STAR CHICKEN</h1>
+                <span>Staff Billing Dashboard</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status">
+                <span class="status-dot"></span>
+                System Online
+            </div>
+            <span id="current-time"></span>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <div class="container">
+        <div class="section-title">
+            <h2>Select Your Branch</h2>
+            <p>Enter the 4-digit staff PIN to unlock and open the invoice system</p>
+        </div>
+
+        <div class="branches-grid" id="branches-grid">
+            <!-- Cards injected by JS -->
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 <span>Star Chicken</span> • Staff Billing Portal • Secure Access
+    </div>
+
+    <!-- Billing Overlay -->
+    <div class="billing-overlay" id="billing-overlay">
+        <div class="billing-panel">
+            <div class="billing-header">
+                <h2>🧾 <span id="billing-branch-name">Branch</span></h2>
+                <button class="close-billing" onclick="closeBilling()">✕</button>
+            </div>
+            <div class="billing-body">
+                <div class="menu-section">
+                    <h3>📋 Menu Items</h3>
+                    <div class="menu-grid" id="menu-grid">
+                        <!-- Menu items injected -->
+                    </div>
+                </div>
+                <div class="cart-section">
+                    <h3>🛒 Current Order</h3>
+                    <div class="cart-items" id="cart-items">
+                        <div class="cart-empty">No items added yet</div>
+                    </div>
+                    <div class="cart-totals">
+                        <div class="total-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">Rs. 0</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Tax (5%)</span>
+                            <span id="tax">Rs. 0</span>
+                        </div>
+                        <div class="total-row grand">
+                            <span>Total</span>
+                            <span id="grand-total">Rs. 0</span>
+                        </div>
+                    </div>
+                    <input type="text" class="customer-input" id="customer-name" placeholder="Customer Name (optional)">
+                    <input type="text" class="customer-input" id="customer-phone" placeholder="Phone Number (optional)">
+                    <div class="action-btns">
+                        <button class="btn-clear" onclick="clearCart()">Clear</button>
+                        <button class="btn-print" onclick="printBill()">🖨️ Print Bill</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Receipt for Print -->
+    <div id="receipt-print"></div>
+
+    <script>
+        // Branch data with unique 4-digit PINs
+        const branches = [
+            { id: 'palm-city', name: 'PALM CITY', pin: '4821', emoji: '🌴', file: 'palmcity.html' },
+            { id: 'kasur', name: 'KASUR', pin: '7392', emoji: '🏙️', file: 'kasure.html' },
+            { id: 'gajjumata', name: 'GAJJUMATA', pin: '1568', emoji: '🏡', file: 'gajjumata.html' },
+            { id: 'mustafabad', name: 'MUSTAFABAD', pin: '9043', emoji: '📍', file: 'mustafabad.html' },
+            { id: 'gulshan-ravi', name: 'GULSHAN RAVI', pin: '6275', emoji: '🌳', file: 'gulshanravi.html' },
+            { id: 'murghzar', name: 'MURGHZAR', pin: '3189', emoji: '🐓', file: 'murghzar.html' }
+        ];
+
+        // Menu items
+        const menuItems = [
+            { id: 1, name: 'Chicken Broast', price: 850, emoji: '🍗' },
+            { id: 2, name: 'Zinger Burger', price: 450, emoji: '🍔' },
+            { id: 3, name: 'Chicken Wings', price: 650, emoji: '🍖' },
+            { id: 4, name: 'Family Pack', price: 2200, emoji: '📦' },
+            { id: 5, name: 'Chicken Roll', price: 280, emoji: '🌯' },
+            { id: 6, name: 'Nuggets (6pc)', price: 380, emoji: '🧀' },
+            { id: 7, name: 'French Fries', price: 250, emoji: '🍟' },
+            { id: 8, name: 'Cold Drink', price: 120, emoji: '🥤' },
+            { id: 9, name: 'Chicken Biryani', price: 550, emoji: '🍚' },
+            { id: 10, name: 'BBQ Platter', price: 1800, emoji: '🔥' },
+            { id: 11, name: 'Chicken Soup', price: 320, emoji: '🥣' },
+            { id: 12, name: 'Dessert Box', price: 400, emoji: '🍰' }
+        ];
+
+        let currentBranch = null;
+        let cart = [];
+
+        // Initialize
+        function init() {
+            renderBranches();
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                day: 'numeric', 
+                month: 'short', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            document.getElementById('current-time').textContent = now.toLocaleString('en-PK', options);
+        }
+
+        function renderBranches() {
+            const grid = document.getElementById('branches-grid');
+            grid.innerHTML = branches.map(branch => `
+                <div class="branch-card" id="card-${branch.id}" data-pin="${branch.pin}">
+                    <div class="card-header">
+                        <div class="branch-name">
+                            <span class="pin">📍</span>
+                            ${branch.name}
+                        </div>
+                        <div class="lock-badge" id="badge-${branch.id}">
+                            🔒 Locked
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="pin-section" id="pin-section-${branch.id}">
+                            <p>Enter 4-digit staff PIN</p>
+                            <div class="pin-input-wrap">
+                                <input type="password" maxlength="1" class="pin-digit" data-branch="${branch.id}" data-index="0" inputmode="numeric" pattern="[0-9]*">
+                                <input type="password" maxlength="1" class="pin-digit" data-branch="${branch.id}" data-index="1" inputmode="numeric" pattern="[0-9]*">
+                                <input type="password" maxlength="1" class="pin-digit" data-branch="${branch.id}" data-index="2" inputmode="numeric" pattern="[0-9]*">
+                                <input type="password" maxlength="1" class="pin-digit" data-branch="${branch.id}" data-index="3" inputmode="numeric" pattern="[0-9]*">
+                            </div>
+                            <button class="unlock-btn" onclick="attemptUnlock('${branch.id}')">
+                                🔓 Unlock Branch
+                            </button>
+                            <div class="error-msg" id="error-${branch.id}"></div>
+                        </div>
+                        <div class="unlocked-content">
+                            <div class="success-icon">✅</div>
+                            <h3>Branch Unlocked</h3>
+                            <p>Ready for billing operations</p>
+                            <button class="enter-btn" onclick="openBilling('${branch.id}')">
+                                🧾 Open Invoice System
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add input listeners
+            document.querySelectorAll('.pin-digit').forEach(input => {
+                input.addEventListener('input', handlePinInput);
+                input.addEventListener('keydown', handlePinKeydown);
+                input.addEventListener('paste', handlePinPaste);
+            });
+        }
+
+        function handlePinInput(e) {
+            const input = e.target;
+            const val = input.value.replace(/[^0-9]/g, '');
+            input.value = val;
+            
+            if (val) {
+                input.classList.add('filled');
+                const index = parseInt(input.dataset.index);
+                const branchId = input.dataset.branch;
+                if (index < 3) {
+                    const next = document.querySelector(`.pin-digit[data-branch="${branchId}"][data-index="${index + 1}"]`);
+                    if (next) next.focus();
+                } else {
+                    // Auto attempt unlock on last digit
+                    attemptUnlock(branchId);
+                }
+            } else {
+                input.classList.remove('filled');
+            }
+        }
+
+        function handlePinKeydown(e) {
+            const input = e.target;
+            const index = parseInt(input.dataset.index);
+            const branchId = input.dataset.branch;
+
+            if (e.key === 'Backspace' && !input.value && index > 0) {
+                const prev = document.querySelector(`.pin-digit[data-branch="${branchId}"][data-index="${index - 1}"]`);
+                if (prev) {
+                    prev.focus();
+                    prev.value = '';
+                    prev.classList.remove('filled');
+                }
+            }
+            if (e.key === 'Enter') {
+                attemptUnlock(branchId);
+            }
+        }
+
+        function handlePinPaste(e) {
+            e.preventDefault();
+            const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, 4);
+            const branchId = e.target.dataset.branch;
+            const digits = document.querySelectorAll(`.pin-digit[data-branch="${branchId}"]`);
+            paste.split('').forEach((char, i) => {
+                if (digits[i]) {
+                    digits[i].value = char;
+                    digits[i].classList.add('filled');
+                }
+            });
+            if (paste.length === 4) {
+                attemptUnlock(branchId);
+            }
+        }
+
+        function attemptUnlock(branchId) {
+            const branch = branches.find(b => b.id === branchId);
+            const digits = document.querySelectorAll(`.pin-digit[data-branch="${branchId}"]`);
+            const entered = Array.from(digits).map(d => d.value).join('');
+            const errorEl = document.getElementById(`error-${branchId}`);
+
+            if (entered.length < 4) {
+                errorEl.textContent = 'Please enter all 4 digits';
+                return;
+            }
+
+            if (entered === branch.pin) {
+                errorEl.textContent = '';
+                const card = document.getElementById(`card-${branchId}`);
+                card.classList.add('unlocked');
+                document.getElementById(`badge-${branchId}`).innerHTML = '🔓 Unlocked';
+                
+                // Clear PIN inputs for security
+                digits.forEach(d => {
+                    d.value = '';
+                    d.classList.remove('filled');
+                });
+
+                // Auto-open the branch invoice system after short delay
+                setTimeout(() => {
+                    openBilling(branchId);
+                }, 600);
+            } else {
+                errorEl.textContent = '❌ Incorrect PIN. Try again.';
+                digits.forEach(d => {
+                    d.value = '';
+                    d.classList.remove('filled');
+                });
+                digits[0].focus();
+                
+                // Shake effect
+                const card = document.getElementById(`card-${branchId}`);
+                card.style.animation = 'none';
+                setTimeout(() => {
+                    card.style.animation = 'shake 0.4s';
+                }, 10);
+            }
+        }
+
+        // Add shake keyframes dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-8px); }
+                40%, 80% { transform: translateX(8px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function openBilling(branchId) {
+            const branch = branches.find(b => b.id === branchId);
+            if (!branch || !branch.file) {
+                alert('Branch not found.');
+                return;
+            }
+            // Check that invoice file exists in the same folder, then open it
+            fetch(branch.file, { method: 'HEAD' })
+                .then(res => {
+                    if (res.ok) {
+                        window.location.href = branch.file;
+                    } else {
+                        showMissingFileError(branch);
+                    }
+                })
+                .catch(() => {
+                    // file:// protocol often blocks fetch — try direct navigation
+                    window.location.href = branch.file;
+                });
+        }
+
+        function showMissingFileError(branch) {
+            alert(
+                'Invoice page not found: ' + branch.file + '\n\n' +
+                'Please keep ALL these files in the SAME folder:\n' +
+                '• dashboard1.html\n' +
+                '• palmcity.html\n' +
+                '• kasure.html\n' +
+                '• gajjumata.html\n' +
+                '• mustafabad.html\n' +
+                '• gulshanravi.html\n' +
+                '• murghzar.html\n' +
+                '• logo1.jpg\n\n' +
+                'Download the full ZIP package and extract everything together.'
+            );
+        }
+
+        function closeBilling() {
+            document.getElementById('billing-overlay').classList.remove('active');
+            currentBranch = null;
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = menuItems.map(item => `
+                <div class="menu-item" onclick="addToCart(${item.id})">
+                    <div class="item-emoji">${item.emoji}</div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">Rs. ${item.price}</div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(itemId) {
+            const item = menuItems.find(m => m.id === itemId);
+            const existing = cart.find(c => c.id === itemId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            renderCart();
+        }
+
+        function removeFromCart(itemId) {
+            cart = cart.filter(c => c.id !== itemId);
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="cart-empty">No items added yet</div>';
+            } else {
+                container.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.emoji} ${item.name}</div>
+                            <div class="cart-item-qty">Qty: ${item.qty} × Rs. ${item.price}</div>
+                        </div>
+                        <div class="cart-item-price">Rs. ${item.qty * item.price}</div>
+                        <button class="cart-item-remove" onclick="removeFromCart(${item.id})">×</button>
+                    </div>
+                `).join('');
+            }
+            updateTotals();
+        }
+
+        function updateTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const tax = Math.round(subtotal * 0.05);
+            const total = subtotal + tax;
+
+            document.getElementById('subtotal').textContent = `Rs. ${subtotal.toLocaleString()}`;
+            document.getElementById('tax').textContent = `Rs. ${tax.toLocaleString()}`;
+            document.getElementById('grand-total').textContent = `Rs. ${total.toLocaleString()}`;
+        }
+
+        function clearCart() {
+            cart = [];
+            document.getElementById('customer-name').value = '';
+            document.getElementById('customer-phone').value = '';
+            renderCart();
+        }
+
+        function printBill() {
+            if (cart.length === 0) {
+                alert('Please add items to the order first.');
+                return;
+            }
+
+            const customerName = document.getElementById('customer-name').value || 'Walk-in Customer';
+            const customerPhone = document.getElementById('customer-phone').value || '—';
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const tax = Math.round(subtotal * 0.05);
+            const total = subtotal + tax;
+            const now = new Date();
+            const billNo = 'SC' + Date.now().toString().slice(-8);
+
+            let itemsHtml = cart.map(item => 
+                `<tr>
+                    <td style="padding:6px 0;border-bottom:1px dashed #ccc;">${item.name}</td>
+                    <td style="text-align:center;padding:6px 0;border-bottom:1px dashed #ccc;">${item.qty}</td>
+                    <td style="text-align:right;padding:6px 0;border-bottom:1px dashed #ccc;">${item.price}</td>
+                    <td style="text-align:right;padding:6px 0;border-bottom:1px dashed #ccc;">${item.qty * item.price}</td>
+                </tr>`
+            ).join('');
+
+            const receipt = `
+                <div style="max-width:320px;margin:0 auto;font-family:'Courier New',monospace;font-size:13px;color:#000;">
+                    <div style="text-align:center;margin-bottom:12px;">
+                        <div style="font-size:22px;font-weight:bold;">★ STAR CHICKEN ★</div>
+                        <div style="font-size:12px;margin-top:4px;">${currentBranch.name} Branch</div>
+                        <div style="font-size:11px;color:#555;">Quality Chicken • Fresh & Fast</div>
+                    </div>
+                    <div style="border-top:1px dashed #000;border-bottom:1px dashed #000;padding:8px 0;margin-bottom:10px;font-size:12px;">
+                        <div>Bill No: ${billNo}</div>
+                        <div>Date: ${now.toLocaleString('en-PK')}</div>
+                        <div>Customer: ${customerName}</div>
+                        <div>Phone: ${customerPhone}</div>
+                    </div>
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:10px;">
+                        <thead>
+                            <tr style="border-bottom:1px solid #000;">
+                                <th style="text-align:left;padding:4px 0;">Item</th>
+                                <th style="text-align:center;padding:4px 0;">Qty</th>
+                                <th style="text-align:right;padding:4px 0;">Rate</th>
+                                <th style="text-align:right;padding:4px 0;">Amt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                    </table>
+                    <div style="border-top:1px dashed #000;padding-top:8px;font-size:13px;">
+                        <div style="display:flex;justify-content:space-between;"><span>Subtotal</span><span>Rs. ${subtotal}</span></div>
+                        <div style="display:flex;justify-content:space-between;"><span>Tax (5%)</span><span>Rs. ${tax}</span></div>
+                        <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:16px;margin-top:6px;border-top:1px solid #000;padding-top:6px;">
+                            <span>TOTAL</span><span>Rs. ${total}</span>
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin-top:16px;font-size:11px;color:#555;">
+                        <div>Thank you for choosing Star Chicken!</div>
+                        <div>Visit again ❤️</div>
+                    </div>
+                </div>
+            `;
+
+            const printEl = document.getElementById('receipt-print');
+            printEl.innerHTML = receipt;
+            window.print();
+        }
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeBilling();
+        });
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
