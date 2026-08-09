@@ -486,7 +486,7 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
     </div>
   </div>
   <div class="topbar-actions">
-    <a href="dashboard.html" class="btn btn-ghost btn-sm" style="text-decoration:none;" title="Back to Branches">← Branches</a>
+    <a href="dashboard1.html" class="btn btn-ghost btn-sm" style="text-decoration:none;" title="Back to Branches">← Branches</a>
     <button class="btn btn-ghost btn-sm" onclick="newInvoice()">＋ New</button>
     <button class="btn btn-success btn-sm" onclick="saveInvoice()">💾 Save</button>
    
@@ -524,7 +524,7 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
           <div class="form-grid">
             <div class="form-group">
               <label>Invoice No.</label>
-              <input type="text" id="invoiceNo" readonly>
+              <input type="text" id="invoiceNo">
             </div>
             <div class="form-group">
               <label>Date</label>
@@ -765,7 +765,7 @@ function deleteInvoiceDB(id) {
 }
 
 function getCounter() {
-  try { return parseInt(localStorage.getItem('sc_gulshan-ravi_counter') || '1001'); } catch(e) { return 1001; }
+  try { return parseInt(localStorage.getItem('sc_gulshan-ravi_counter') || '01'); } catch(e) { return 100000; }
 }
 function setCounter(n) {
   try { localStorage.setItem('sc_gulshan-ravi_counter', n); } catch(e) {}
