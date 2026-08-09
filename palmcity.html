@@ -1274,7 +1274,7 @@ function openWhatsAppWithPhoto(blob, fileName, invNo) {
   setTimeout(() => URL.revokeObjectURL(link.href), 8000);
 
   // Open WhatsApp chat directly with 03274474414
-  const msg = 'Star Chicken Invoice ' + invNo + '\n(Attach the invoice photo that was just saved, then Send)';
+  const msg = 'Hatchary ' + invNo + '\n(Attach the invoice photo that was just saved, then Send)';
   window.open(
     'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(msg),
     '_blank'
