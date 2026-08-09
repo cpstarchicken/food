@@ -472,6 +472,105 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 
+
+/* ─── Sales Modal ─── */
+.sales-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+  z-index: 2000; align-items: center; justify-content: center; padding: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.sales-overlay.show { display: flex; }
+.sales-modal {
+  background: var(--surface); border-radius: 16px; width: 100%; max-width: 480px;
+  max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+.sales-modal-header {
+  padding: 16px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: linear-gradient(180deg, #FAFAFA 0%, #fff 100%);
+  position: sticky; top: 0; z-index: 1;
+}
+.sales-modal-header h3 {
+  font-size: 1rem; font-weight: 800; color: var(--ink);
+  display: flex; align-items: center; gap: 8px;
+}
+.sales-modal-body { padding: 16px 18px 20px; }
+.sales-cards {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px;
+}
+.sales-card {
+  background: var(--bg); border-radius: 12px; padding: 12px 10px;
+  text-align: center; border: 1px solid var(--border);
+}
+.sales-card .sc-label {
+  font-size: 0.65rem; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px;
+}
+.sales-card .sc-amt {
+  font-size: 0.95rem; font-weight: 800; color: var(--primary); line-height: 1.2;
+}
+.sales-card .sc-cnt {
+  font-size: 0.7rem; color: var(--muted); margin-top: 3px;
+}
+.sales-card.highlight {
+  background: var(--primary-soft); border-color: rgba(211,47,47,0.25);
+}
+.sales-custom {
+  background: var(--gold-soft); border: 1px dashed var(--gold);
+  border-radius: 12px; padding: 14px; margin-bottom: 14px;
+}
+.sales-custom label {
+  font-size: 0.72rem; font-weight: 700; color: var(--ink-soft);
+  text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 8px;
+}
+.sales-custom-row {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+.sales-custom-row input {
+  width: 80px; height: 40px; padding: 0 10px; border: 1.5px solid var(--border);
+  border-radius: 9px; font-size: 0.95rem; font-family: inherit; font-weight: 700;
+  text-align: center; background: #fff;
+}
+.sales-custom-row input:focus {
+  outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(211,47,47,0.1);
+}
+.sales-custom-result {
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(249,168,37,0.35);
+  display: none;
+}
+.sales-custom-result.show { display: block; }
+.sales-custom-result .big-amt {
+  font-size: 1.35rem; font-weight: 800; color: var(--primary);
+}
+.sales-custom-result .meta {
+  font-size: 0.8rem; color: var(--muted); margin-top: 2px;
+}
+.sales-list-title {
+  font-size: 0.75rem; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.4px; margin: 14px 0 8px;
+}
+.sales-list {
+  max-height: 200px; overflow-y: auto; border: 1px solid var(--border);
+  border-radius: 10px; background: #FAFAFA;
+}
+.sales-list-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 12px; border-bottom: 1px solid var(--border); font-size: 0.82rem; gap: 8px;
+}
+.sales-list-item:last-child { border-bottom: none; }
+.sales-list-item .si-no { font-weight: 700; color: var(--ink); }
+.sales-list-item .si-date { color: var(--muted); font-size: 0.75rem; }
+.sales-list-item .si-amt { font-weight: 700; color: var(--primary); white-space: nowrap; }
+.sales-empty {
+  text-align: center; padding: 20px; color: var(--muted); font-size: 0.85rem;
+}
+@media (max-width: 480px) {
+  .sales-cards { grid-template-columns: 1fr; }
+  .sales-card .sc-amt { font-size: 1.1rem; }
+}
+
 </style>
 </head>
 <body>
@@ -487,7 +586,9 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
     </div>
   </div>
   <div class="topbar-actions">
-<a href="dashboard.html" class="btn btn-ghost btn-sm" style="text-decoration:none;" title="Back to Branches">← Branches</a>  </div>
+<button class="btn btn-gold btn-sm" onclick="openSalesModal()" title="Total Sale report">📊 Sales</button>
+<a href="dashboard.html" class="btn btn-ghost btn-sm" style="text-decoration:none;" title="Back to Branches">← Branches</a>
+  </div>
 </div>
 <div class="sidebar-overlay no-print" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
@@ -665,6 +766,54 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
 </div>
 
 <div class="toast" id="toast"></div>
+
+
+<!-- SALES MODAL -->
+<div class="sales-overlay no-print" id="salesOverlay" onclick="if(event.target===this)closeSalesModal()">
+  <div class="sales-modal" role="dialog" aria-labelledby="salesTitle">
+    <div class="sales-modal-header">
+      <h3 id="salesTitle">📊 Total Sale</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeSalesModal()" style="height:32px;padding:0 10px;">✕</button>
+    </div>
+    <div class="sales-modal-body">
+      <div class="sales-cards">
+        <div class="sales-card highlight">
+          <div class="sc-label">Today</div>
+          <div class="sc-amt" id="saleToday">Rs. 0</div>
+          <div class="sc-cnt" id="saleTodayCnt">0 invoices</div>
+        </div>
+        <div class="sales-card">
+          <div class="sc-label">This Week</div>
+          <div class="sc-amt" id="saleWeek">Rs. 0</div>
+          <div class="sc-cnt" id="saleWeekCnt">0 invoices</div>
+        </div>
+        <div class="sales-card">
+          <div class="sc-label">This Month</div>
+          <div class="sc-amt" id="saleMonth">Rs. 0</div>
+          <div class="sc-cnt" id="saleMonthCnt">0 invoices</div>
+        </div>
+      </div>
+
+      <div class="sales-custom">
+        <label>Custom period — last N days</label>
+        <div class="sales-custom-row">
+          <input type="number" id="saleDays" min="1" max="365" value="7" placeholder="Days">
+          <span style="font-size:0.85rem;color:var(--muted);">days</span>
+          <button class="btn btn-primary btn-sm" onclick="calcCustomSale()" style="height:40px;">Calculate</button>
+        </div>
+        <div class="sales-custom-result" id="customSaleResult">
+          <div class="big-amt" id="saleCustom">Rs. 0.00</div>
+          <div class="meta" id="saleCustomMeta">0 invoices</div>
+        </div>
+      </div>
+
+      <div class="sales-list-title" id="salesListTitle">Recent invoices in period</div>
+      <div class="sales-list" id="salesList">
+        <div class="sales-empty">Open Total Sale to load data.</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ══════════ PRODUCTS ══════════ */
@@ -1378,6 +1527,114 @@ async function captureInvoice() {
     });
   });
 })();
+
+
+
+/* ══════════ TOTAL SALE ══════════ */
+function openSalesModal() {
+  calcPeriodSales();
+  document.getElementById('salesOverlay').classList.add('show');
+  document.getElementById('saleDays').value = '7';
+  calcCustomSale();
+}
+function closeSalesModal() {
+  document.getElementById('salesOverlay').classList.remove('show');
+}
+function parseInvDate(inv) {
+  // Prefer invoice date (YYYY-MM-DD); fallback to savedAt
+  if (inv.date && /^\d{4}-\d{2}-\d{2}/.test(inv.date)) {
+    const d = new Date(inv.date + 'T12:00:00');
+    if (!isNaN(d)) return d;
+  }
+  if (inv.savedAt) return new Date(inv.savedAt);
+  return null;
+}
+function startOfDay(d) {
+  const x = new Date(d);
+  x.setHours(0,0,0,0);
+  return x;
+}
+function sumInvoices(list) {
+  const total = list.reduce((s, inv) => s + (Number(inv.grandTotal) || 0), 0);
+  return { total, count: list.length, list };
+}
+function filterByRange(fromDate, toDate) {
+  const from = startOfDay(fromDate).getTime();
+  const to = startOfDay(toDate).getTime() + 86400000 - 1; // end of toDate
+  return allHistory.filter(inv => {
+    const d = parseInvDate(inv);
+    if (!d) return false;
+    const t = d.getTime();
+    return t >= from && t <= to;
+  });
+}
+function fmtSale(n) {
+  return 'Rs. ' + Number(n).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function calcPeriodSales() {
+  const now = new Date();
+  const todayStart = startOfDay(now);
+
+  // Today
+  const today = sumInvoices(filterByRange(todayStart, now));
+  document.getElementById('saleToday').textContent = fmtSale(today.total);
+  document.getElementById('saleTodayCnt').textContent = today.count + (today.count === 1 ? ' invoice' : ' invoices');
+
+  // This week (Mon–Sun, local)
+  const day = now.getDay(); // 0 Sun
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const weekStart = new Date(todayStart);
+  weekStart.setDate(weekStart.getDate() + mondayOffset);
+  const week = sumInvoices(filterByRange(weekStart, now));
+  document.getElementById('saleWeek').textContent = fmtSale(week.total);
+  document.getElementById('saleWeekCnt').textContent = week.count + (week.count === 1 ? ' invoice' : ' invoices');
+
+  // This month
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const month = sumInvoices(filterByRange(monthStart, now));
+  document.getElementById('saleMonth').textContent = fmtSale(month.total);
+  document.getElementById('saleMonthCnt').textContent = month.count + (month.count === 1 ? ' invoice' : ' invoices');
+}
+function calcCustomSale() {
+  const days = Math.max(1, Math.min(365, parseInt(document.getElementById('saleDays').value) || 7));
+  document.getElementById('saleDays').value = days;
+  const now = new Date();
+  const from = new Date(startOfDay(now));
+  from.setDate(from.getDate() - (days - 1)); // inclusive of today
+  const result = sumInvoices(filterByRange(from, now));
+  document.getElementById('saleCustom').textContent = fmtSale(result.total);
+  document.getElementById('saleCustomMeta').textContent =
+    result.count + (result.count === 1 ? ' invoice' : ' invoices') +
+    ' · last ' + days + ' day' + (days === 1 ? '' : 's') +
+    ' (' + from.toLocaleDateString() + ' – ' + now.toLocaleDateString() + ')';
+  document.getElementById('customSaleResult').classList.add('show');
+  renderSalesList(result.list, 'Last ' + days + ' day' + (days === 1 ? '' : 's'));
+}
+function renderSalesList(list, title) {
+  document.getElementById('salesListTitle').textContent = title || 'Invoices in period';
+  const el = document.getElementById('salesList');
+  if (!list.length) {
+    el.innerHTML = '<div class="sales-empty">No invoices in this period.</div>';
+    return;
+  }
+  // newest first
+  const sorted = list.slice().sort((a, b) => {
+    const da = parseInvDate(a)?.getTime() || 0;
+    const db = parseInvDate(b)?.getTime() || 0;
+    return db - da;
+  });
+  el.innerHTML = sorted.map(inv => `
+    <div class="sales-list-item">
+      <div>
+        <div class="si-no">${esc(inv.invoiceNo || '—')}</div>
+        <div class="si-date">${esc(inv.date || '—')} · ${esc(inv.customerName || inv.shopName || '')}</div>
+      </div>
+      <div class="si-amt">${fmtSale(inv.grandTotal || 0)}</div>
+    </div>`).join('');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSalesModal();
+});
 
 </script>
 </body>
