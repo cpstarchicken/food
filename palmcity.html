@@ -571,6 +571,45 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
   .sales-card .sc-amt { font-size: 1.1rem; }
 }
 
+
+/* ─── Action Sheet (Share / Import / Print) ─── */
+.action-sheet-overlay {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.45); align-items: flex-end; justify-content: center;
+  padding: 12px; -webkit-tap-highlight-color: transparent;
+}
+.action-sheet-overlay.show { display: flex; }
+.action-sheet {
+  width: 100%; max-width: 400px; background: var(--surface);
+  border-radius: 16px 16px 12px 12px; overflow: hidden;
+  box-shadow: 0 -4px 30px rgba(0,0,0,0.15); animation: sheetUp 0.22s ease;
+}
+@keyframes sheetUp {
+  from { transform: translateY(40px); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.action-sheet-title {
+  padding: 14px 16px 8px; font-size: 0.75rem; font-weight: 700;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center;
+}
+.action-sheet-btn {
+  width: 100%; display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border: none; background: transparent; cursor: pointer;
+  font-family: inherit; text-align: left; border-top: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.action-sheet-btn:hover, .action-sheet-btn:active { background: var(--primary-soft); }
+.action-sheet-btn .as-icon { font-size: 1.35rem; flex-shrink: 0; width: 32px; text-align: center; }
+.action-sheet-btn .as-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.action-sheet-btn .as-text strong { font-size: 0.95rem; font-weight: 700; color: var(--ink); }
+.action-sheet-btn .as-text small { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+.action-sheet-cancel {
+  width: 100%; padding: 14px; border: none; border-top: 1px solid var(--border);
+  background: #FAFAFA; font-family: inherit; font-size: 0.95rem; font-weight: 700;
+  color: var(--primary); cursor: pointer; margin-top: 4px;
+}
+.action-sheet-cancel:hover { background: var(--primary-soft); }
+
 </style>
 </head>
 <body>
@@ -730,21 +769,21 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
       <div class="footer-bar">
         <div class="item-count no-print"><strong id="itemCountText">0</strong> product(s)</div>
         <div class="totals-box">
-          <div class="t-row"><span>Sub Total</span><span id="subTotal">Rs. 0.00</span></div>
+          <div class="t-row"><span>Sub Total</span><span id="subTotal">Rs. 0</span></div>
           <div class="t-row">
             <span>Discount</span>
             <input type="number" id="discount" min="0" step="0.01" value="0" oninput="calcTotals(); markDirty()" class="no-print">
-            <span id="discountPrint" class="print-show">Rs. 0.00</span>
+            <span id="discountPrint" class="print-show">Rs. 0</span>
           </div>
-          <div class="t-row t-grand"><span>Grand Total</span><span id="grandTotal">Rs. 0.00</span></div>
+          <div class="t-row t-grand"><span>Grand Total</span><span id="grandTotal">Rs. 0</span></div>
           <div class="t-row t-paid">
             <span>Amount Paid</span>
             <input type="number" id="amountPaid" min="0" step="0.01" value="0" oninput="calcTotals(); markDirty()" class="no-print">
-            <span id="amountPaidPrint" class="print-show">Rs. 0.00</span>
+            <span id="amountPaidPrint" class="print-show">Rs. 0</span>
           </div>
           <div class="t-row t-balance due" id="balanceRow">
             <span id="balanceLabel">Balance Due</span>
-            <span id="balanceAmount">Rs. 0.00</span>
+            <span id="balanceAmount">Rs. 0</span>
           </div>
         </div>
       </div>
@@ -755,12 +794,43 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
       </div>
     </div>
 
-    <div class="actions no-print">
+            <div class="actions no-print">
       <button class="btn btn-ghost" onclick="newInvoice()">🆕 New</button>
       <button class="btn btn-success" onclick="saveInvoice()">💾 Save</button>
       <button class="btn btn-danger" id="deleteInvoiceBtn" style="height:40px;padding:0 16px;font-size:0.85rem;display:none;" onclick="deleteCurrentInvoice()">🗑 Delete Invoice</button>
       <button class="btn btn-primary" onclick="shareToWhatsApp()">📷 WhatsApp</button>
-      <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+      <button class="btn btn-ghost" onclick="saveAsPNG()">🖼 Save PNG</button>
+      <button class="btn btn-gold" onclick="openSharePrintMenu()">⋯ Share / Print</button>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importInvoice(event)">
+    </div>
+
+    <!-- Share / Print / Import menu -->
+    <div class="action-sheet-overlay no-print" id="sharePrintOverlay" onclick="if(event.target===this)closeSharePrintMenu()">
+      <div class="action-sheet">
+        <div class="action-sheet-title">Share · Import · Print</div>
+        <button class="action-sheet-btn" onclick="closeSharePrintMenu(); shareForEdit()">
+          <span class="as-icon">📤</span>
+          <span class="as-text">
+            <strong>Share Edit</strong>
+            <small>Send JSON so others can open &amp; edit</small>
+          </span>
+        </button>
+        <button class="action-sheet-btn" onclick="closeSharePrintMenu(); document.getElementById('importFile').click()">
+          <span class="as-icon">📥</span>
+          <span class="as-text">
+            <strong>Import</strong>
+            <small>Load a shared invoice to edit</small>
+          </span>
+        </button>
+        <button class="action-sheet-btn" onclick="closeSharePrintMenu(); window.print()">
+          <span class="as-icon">🖨</span>
+          <span class="as-text">
+            <strong>Print</strong>
+            <small>Print or save as PDF</small>
+          </span>
+        </button>
+        <button class="action-sheet-cancel" onclick="closeSharePrintMenu()">Cancel</button>
+      </div>
     </div>
   </div>
 </div>
@@ -802,7 +872,7 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
           <button class="btn btn-primary btn-sm" onclick="calcCustomSale()" style="height:40px;">Calculate</button>
         </div>
         <div class="sales-custom-result" id="customSaleResult">
-          <div class="big-amt" id="saleCustom">Rs. 0.00</div>
+          <div class="big-amt" id="saleCustom">Rs. 0</div>
           <div class="meta" id="saleCustomMeta">0 invoices</div>
         </div>
       </div>
@@ -1238,7 +1308,7 @@ function addItem() {
   const rate = parseFloat(document.getElementById('rate').value) || 0;
   if (weight <= 0) { toast('Enter Weight.', 'error'); return; }
   if (rate <= 0) { toast('Enter Rate.', 'error'); return; }
-  const amount = weight * rate;
+  const amount = Math.round(weight * rate);
   const row = { name, qty, weight, rate, amount };
   if (editingIndex >= 0 && editingIndex < items.length) {
     items[editingIndex] = row;
@@ -1347,7 +1417,7 @@ function calcTotals() {
   } else {
     // Fully paid
     balLabel.textContent = 'Balance';
-    balAmt.textContent = 'Rs. 0.00 (Paid)';
+    balAmt.textContent = 'Rs. 0 (Paid)';
     balRow.classList.add('paid-full');
   }
 }
@@ -1377,7 +1447,7 @@ function toast(msg, type) {
 }
 
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function fmt(n) { return Number(n).toFixed(2); }
+function fmt(n) { return Math.round(Number(n) || 0).toString(); }
 
 ['customerName','shopName','billMaker','customerPhone','invoiceDate'].forEach(id => {
   document.getElementById(id)?.addEventListener('input', () => { markDirty(); updatePrintMeta(); });
@@ -1404,8 +1474,7 @@ async function shareToWhatsApp() {
     const canvas = await captureInvoice();
     const invNo = document.getElementById('invoiceNo').value || 'invoice';
     const fileName = 'StarChicken_' + invNo.replace(/[^\w\-]/g, '_') + '.jpg';
-      const caption = 'Star Chicken Invoice ' + invNo;
-
+    const caption = 'Star Chicken Invoice ' + invNo;
 
     const blob = await new Promise((resolve, reject) => {
       canvas.toBlob(
@@ -1508,6 +1577,166 @@ async function captureInvoice() {
   }
 }
 
+
+
+function openSharePrintMenu() {
+  document.getElementById('sharePrintOverlay').classList.add('show');
+}
+function closeSharePrintMenu() {
+  document.getElementById('sharePrintOverlay')?.classList.remove('show');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSharePrintMenu();
+});
+
+/* ══════════ SAVE PNG ══════════ */
+async function saveAsPNG() {
+  if (!items.length) {
+    toast('Add products first, then save.', 'error');
+    return;
+  }
+  showExporting('Saving invoice as PNG…');
+  try {
+    const canvas = await captureInvoice();
+    const invNo = document.getElementById('invoiceNo').value || 'invoice';
+    const fileName = 'StarChicken_' + invNo.replace(/[^\w\-]/g, '_') + '.png';
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    hideExporting();
+    toast('PNG saved to device!', 'success');
+  } catch (e) {
+    console.error(e);
+    hideExporting();
+    toast('Could not save PNG. Try Print instead.', 'error');
+  }
+}
+
+/* ══════════ SHARE FOR EDIT (JSON) ══════════ */
+function getInvoicePayload() {
+  const sub = items.reduce((s, it) => s + it.amount, 0);
+  const disc = parseFloat(document.getElementById('discount').value) || 0;
+  const grand = Math.max(0, sub - disc);
+  const paid = parseFloat(document.getElementById('amountPaid').value) || 0;
+  return {
+    version: 1,
+    invoiceNo: document.getElementById('invoiceNo').value,
+    date: document.getElementById('invoiceDate').value,
+    customerName: document.getElementById('customerName').value,
+    shopName: document.getElementById('shopName').value,
+    billMaker: document.getElementById('billMaker').value,
+    customerPhone: document.getElementById('customerPhone').value,
+    items: items.map(it => ({
+      name: it.name,
+      qty: it.qty,
+      weight: it.weight,
+      rate: it.rate,
+      amount: it.amount
+    })),
+    discount: disc,
+    grandTotal: grand,
+    amountPaid: paid,
+    exportedAt: Date.now()
+  };
+}
+
+function downloadBlob(blob, fileName) {
+  const link = document.createElement('a');
+  link.download = fileName;
+  link.href = URL.createObjectURL(blob);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(link.href), 8000);
+}
+
+async function shareForEdit() {
+  if (!items.length) {
+    toast('Add products first, then share.', 'error');
+    return;
+  }
+  const payload = getInvoicePayload();
+  const json = JSON.stringify(payload, null, 2);
+  const invNo = payload.invoiceNo || 'invoice';
+  const fileName = 'StarChicken_' + invNo.replace(/[^\w\-]/g, '_') + '_edit.json';
+  const blob = new Blob([json], { type: 'application/json' });
+  const file = new File([blob], fileName, { type: 'application/json' });
+
+  const helpText = 'Star Chicken Invoice ' + invNo + '\\nOpen Star Chicken app → tap Import → select this file to edit.';
+
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: 'Star Chicken Invoice ' + invNo + ' (editable)',
+        text: helpText
+      });
+      toast('Shared! Recipient: Import file to edit.', 'success');
+      return;
+    } catch (shareErr) {
+      if (shareErr && shareErr.name === 'AbortError') return;
+    }
+  }
+  downloadBlob(blob, fileName);
+  toast('JSON downloaded. Send file → other person taps Import to edit', 'success');
+}
+
+function importInvoice(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function () {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || !Array.isArray(data.items)) {
+        throw new Error('Not a valid invoice file');
+      }
+      if (data.invoiceNo) document.getElementById('invoiceNo').value = data.invoiceNo;
+      if (data.date) document.getElementById('invoiceDate').value = data.date;
+      document.getElementById('customerName').value = data.customerName || '';
+      document.getElementById('shopName').value = data.shopName || '';
+      document.getElementById('billMaker').value = data.billMaker || '';
+      document.getElementById('customerPhone').value = data.customerPhone || '';
+      document.getElementById('discount').value = data.discount != null ? data.discount : 0;
+      document.getElementById('amountPaid').value = data.amountPaid != null ? data.amountPaid : 0;
+      items = data.items.map(function (it) {
+        return {
+          name: it.name || '',
+          qty: it.qty != null ? it.qty : 0,
+          weight: Number(it.weight) || 0,
+          rate: Number(it.rate) || 0,
+          amount: Number(it.amount) || 0
+        };
+      });
+      currentId = null;
+      isDirty = true;
+      const badge = document.getElementById('statusBadge');
+      if (badge) {
+        badge.innerHTML = '<span class="status-dot draft"></span> Imported';
+        badge.className = 'badge';
+      }
+      const delBtn = document.getElementById('deleteInvoiceBtn');
+      if (delBtn) delBtn.style.display = 'none';
+      render();
+      updatePrintMeta();
+      toast('Invoice imported — edit & Save when ready', 'success');
+    } catch (e) {
+      console.error(e);
+      toast('Invalid invoice file. Use Share Edit JSON.', 'error');
+    }
+    ev.target.value = '';
+  };
+  reader.onerror = function () {
+    toast('Could not read file.', 'error');
+    ev.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+
 /* Enter key flow: Qty → Weight → Rate → Add */
 (function setupFieldNav() {
   const order = ['qty', 'weight', 'rate'];
@@ -1570,7 +1799,7 @@ function filterByRange(fromDate, toDate) {
   });
 }
 function fmtSale(n) {
-  return 'Rs. ' + Number(n).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return 'Rs. ' + Math.round(Number(n) || 0).toLocaleString('en-PK');
 }
 function calcPeriodSales() {
   const now = new Date();
