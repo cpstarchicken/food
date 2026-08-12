@@ -7,8 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="Star Chicken Invoice Management App">
-<title>Star Chicken • Hatchary</title>
-  <link rel="icon" href="https://scontent.flhe1-1.fna.fbcdn.net/v/t39.30808-6/768284848_122107335615415980_8105440223794946327_n.jpg?stp=dst-jpg_tt6&cstp=mx784x741&ctp=p552x414&_nc_cat=100&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=127cfc&_nc_ohc=JTUf6UOLvegQ7kNvwFq7JCr&_nc_oc=AdrLwRcjFK7OSfiteG0_YfqYlN1P7C9gZSPJs2CjLAKvwqkdbOIKMu8FJVwyrk09plI&_nc_zt=23&_nc_ht=scontent.flhe1-1.fna&_nc_gid=79jBF8x9bvAX4bRR4AF-EA&_nc_ss=7b2a8&oh=00_AQGnv9UKudvSTQyjozR6xih91k1uNf9oKNFi5DE1bZgGpw&oe=6A811E97" type="image/jpeg">  
+<title>Star Chicken • PALM CITY Invoice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1237,9 +1236,9 @@ function addItem() {
   const qty = parseFloat(document.getElementById('qty').value) || 0;
   const weight = parseFloat(document.getElementById('weight').value) || 0;
   const rate = parseFloat(document.getElementById('rate').value) || 0;
-  if (qty <= 0 && weight <= 0) { toast('Enter Qty or Weight.', 'error'); return; }
+  if (weight <= 0) { toast('Enter Weight.', 'error'); return; }
   if (rate <= 0) { toast('Enter Rate.', 'error'); return; }
-  const amount = (weight > 0 && qty <= 1) ? weight * rate : qty * rate;
+  const amount = weight * rate;
   const row = { name, qty, weight, rate, amount };
   if (editingIndex >= 0 && editingIndex < items.length) {
     items[editingIndex] = row;
