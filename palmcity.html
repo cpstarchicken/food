@@ -1404,7 +1404,6 @@ async function shareToWhatsApp() {
     const canvas = await captureInvoice();
     const invNo = document.getElementById('invoiceNo').value || 'invoice';
     const fileName = 'StarChicken_' + invNo.replace(/[^\w\-]/g, '_') + '.jpg';
-    const caption = 'Star Chicken Invoice ' + invNo;
 
     const blob = await new Promise((resolve, reject) => {
       canvas.toBlob(
