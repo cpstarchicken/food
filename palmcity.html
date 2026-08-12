@@ -572,6 +572,55 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
 }
 
 
+
+/* ─── Product Sale Modal ─── */
+.ps-date-row {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px;
+}
+.ps-date-row label {
+  font-size: 0.72rem; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.ps-date-row input[type="date"] {
+  height: 38px; padding: 0 10px; border: 1.5px solid var(--border);
+  border-radius: 9px; font-family: inherit; font-size: 0.9rem; background: #fff;
+}
+.ps-date-row input[type="date"]:focus {
+  outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(211,47,47,0.1);
+}
+.ps-summary {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px;
+}
+.ps-sum-card {
+  background: #FAFAFA; border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; text-align: center;
+}
+.ps-sum-card .ps-lbl { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+.ps-sum-card .ps-val { font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-top: 2px; }
+.ps-table-wrap {
+  max-height: 360px; overflow-y: auto; border: 1px solid var(--border);
+  border-radius: 10px; -webkit-overflow-scrolling: touch;
+}
+.ps-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.ps-table thead th {
+  position: sticky; top: 0; background: var(--ink); color: #fff;
+  font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.3px; padding: 10px 8px; text-align: left; white-space: nowrap; z-index: 1;
+}
+.ps-table tbody td {
+  padding: 9px 8px; border-bottom: 1px solid var(--border); vertical-align: middle;
+}
+.ps-table tbody tr:nth-child(even) { background: #FAFAFA; }
+.ps-table tbody tr:hover { background: #FFFBF0; }
+.ps-table .ps-name { font-weight: 600; color: var(--ink); }
+.ps-table .ps-num { font-weight: 700; color: var(--primary); white-space: nowrap; text-align: right; }
+.ps-table .ps-qty { text-align: right; color: var(--ink-soft); }
+.ps-empty { text-align: center; padding: 36px 14px; color: var(--muted); font-size: 0.88rem; }
+@media (max-width: 480px) {
+  .ps-summary { grid-template-columns: 1fr; }
+}
+
 /* ─── Action Sheet (Share / Import / Print) ─── */
 .action-sheet-overlay {
   display: none; position: fixed; inset: 0; z-index: 300;
@@ -625,9 +674,37 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
     </div>
   </div>
   <div class="topbar-actions">
-<button class="btn btn-gold btn-sm" onclick="openSalesModal()" title="Total Sale report">📊 Sales</button>
-<a href="dashboard.html" class="btn btn-ghost btn-sm" style="text-decoration:none;" title="Back to Branches">← Branches</a>
+<button class="btn btn-gold btn-sm" onclick="openReportsMenu()" title="Reports & Branches">☰ Menu</button>
   </div>
+
+    <!-- Reports / Branches menu -->
+    <div class="action-sheet-overlay no-print" id="reportsMenuOverlay" onclick="if(event.target===this)closeReportsMenu()">
+      <div class="action-sheet">
+        <div class="action-sheet-title">Reports · Branches</div>
+        <button class="action-sheet-btn" onclick="closeReportsMenu(); openProductSaleModal()">
+          <span class="as-icon">📦</span>
+          <span class="as-text">
+            <strong>Product Sale</strong>
+            <small>Daily item-wise qty &amp; weight</small>
+          </span>
+        </button>
+        <button class="action-sheet-btn" onclick="closeReportsMenu(); openSalesModal()">
+          <span class="as-icon">📊</span>
+          <span class="as-text">
+            <strong>Total Sale</strong>
+            <small>Today / week / month totals</small>
+          </span>
+        </button>
+        <a href="dashboard.html" class="action-sheet-btn" style="text-decoration:none;" onclick="closeReportsMenu()">
+          <span class="as-icon">🏪</span>
+          <span class="as-text">
+            <strong>Branches</strong>
+            <small>Switch to another branch</small>
+          </span>
+        </a>
+        <button class="action-sheet-cancel" onclick="closeReportsMenu()">Cancel</button>
+      </div>
+    </div>
 </div>
 <div class="sidebar-overlay no-print" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
@@ -807,7 +884,7 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
     <!-- Share / Print / Import menu -->
     <div class="action-sheet-overlay no-print" id="sharePrintOverlay" onclick="if(event.target===this)closeSharePrintMenu()">
       <div class="action-sheet">
-        <div class="action-sheet-title">Share · Import · Print</div>
+        <div class="action-sheet-title">Share · Import · Print · Excel</div>
         <button class="action-sheet-btn" onclick="closeSharePrintMenu(); shareForEdit()">
           <span class="as-icon">📤</span>
           <span class="as-text">
@@ -829,6 +906,13 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
             <small>Print or save as PDF</small>
           </span>
         </button>
+                <button class="action-sheet-btn" onclick="closeSharePrintMenu(); downloadInvoiceExcel()">
+          <span class="as-icon">📊</span>
+          <span class="as-text">
+            <strong>Download Excel</strong>
+            <small>Save invoice as Excel (.csv) file</small>
+          </span>
+        </button>
         <button class="action-sheet-cancel" onclick="closeSharePrintMenu()">Cancel</button>
       </div>
     </div>
@@ -837,6 +921,54 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
 
 <div class="toast" id="toast"></div>
 
+
+
+<!-- PRODUCT SALE MODAL -->
+<div class="sales-overlay no-print" id="productSaleOverlay" onclick="if(event.target===this)closeProductSaleModal()">
+  <div class="sales-modal" role="dialog" aria-labelledby="psTitle" style="max-width:560px">
+    <div class="sales-modal-header">
+      <h3 id="psTitle">📦 Product Sale</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeProductSaleModal()" style="height:32px;padding:0 10px;">✕</button>
+    </div>
+    <div class="sales-modal-body">
+      <div class="ps-date-row">
+        <label for="psDate">Date</label>
+        <input type="date" id="psDate" onchange="calcProductSale()">
+        <button class="btn btn-primary btn-sm" onclick="setPsToday(); calcProductSale()" style="height:38px;">Today</button>
+      </div>
+      <div class="ps-summary">
+        <div class="ps-sum-card">
+          <div class="ps-lbl">Products</div>
+          <div class="ps-val" id="psCount">0</div>
+        </div>
+        <div class="ps-sum-card">
+          <div class="ps-lbl">Total Qty</div>
+          <div class="ps-val" id="psQty">0</div>
+        </div>
+        <div class="ps-sum-card">
+          <div class="ps-lbl">Total Weight</div>
+          <div class="ps-val" id="psWgt">0 kg</div>
+        </div>
+      </div>
+      <div class="ps-table-wrap">
+        <table class="ps-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Product</th>
+              <th style="text-align:right">Qty</th>
+              <th style="text-align:right">Weight (kg)</th>
+              <th style="text-align:right">Amount (Rs)</th>
+            </tr>
+          </thead>
+          <tbody id="psBody">
+            <tr><td colspan="5"><div class="ps-empty">No sales on this date.</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- SALES MODAL -->
 <div class="sales-overlay no-print" id="salesOverlay" onclick="if(event.target===this)closeSalesModal()">
@@ -887,7 +1019,7 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
 
 <script>
 /* ══════════ PRODUCTS ══════════ */
-const chickenProducts = ["SBB Trimming","SBB Slice","Skinless Breast","Boneless Handi","Boneless Breast whole","Breast RS","Breast Yum","brest Fillet","Premium Mince","Zinger CP S/O","Zinger CP S/L","Zinger SBL","Thigh Trimming","Trimming Bone","Drumstick S/O","Drumstick S/L","Whole Leg","Drummet A","Drummet B","Niblet A","Niblet B","Wing Tip","3 Joint Wings","2 Joint Wings S/O","2 Joint Wings S/L","Karahi Cut","Whole Bird S/O","Whole Bird S/L","D Trimming","Neck","Carcass","Skin","Tail","Heart","Liver","Gizzard","Shanks","MDM Mince","Marinated ButterFly JC","Marinated ButterFly LC","Marinated Niblet 1kg","Marinated Niblet","Marinated Drummet 1kg","Marinated Drummet","Marinated 5 cut","Injected Chicken Pieces","Marinated Zinger CP","Marinated Zinger SBL","Marinated Zinger S/O","Marinated Zinger S/L","Marinated Drumstick","Marinated Strips","Marinated Strips 2kg","Marinated Crispy","Kebab","Nuggets","Chicken Fries","Burger Patty 12 Pcs","Burger Patty 8 Pcs","Chicken Samosa 12 pcs","Chicken Samosa 24 pcs","Fried Samosa","Fried Spring Roll","Chicken Roll 12 pcs","Chicken Roll 24 pcs","Breading Flour","Chapli Kabab","Chicken Kofta"];
+const chickenProducts = ["SBB Trimming","SBB Slice","Skinless Breast","Boneless Handi","Boneless Breast","Breast RS","Breast Yum","Inner Fillet","Premium Mince","Zinger CP S/O","Zinger CP S/L","Zinger S/L JC/RS","Thigh Trimming","Trimming Bone","Drumstick S/O","Drumstick S/L","Whole Leg","Drummet A","Drummet B","Niblet A","Niblet B","Wing Tip","3 Joint Wings","2 Joint Wings S/O","2 Joint Wings S/L","Karahi Cut","Whole Bird S/O","Whole Bird S/L","D Trimming","Neck","Carcass","Skin","Tail","Heart","Liver","Gizzard","Shanks","MDM Mince","Marinated ButterFly JC","Marinated ButterFly LC","Marinated Niblet 1kg","Marinated Niblet","Marinated Drummet 1kg","Marinated Drummet","Marinated 5 cut","Injected Chicken Pieces","Marinated Zinger CP","Marinated Zinger JC","Marinated Zinger S/O","Marinated Zinger S/L","Marinated Drumstick","Marinated Strips","Marinated Strips 2kg","Marinated Crispy","Kebab","Nuggets","Chicken Fries","Burger Patty 12 Pcs","Burger Patty 8 Pcs","Chicken Samosa 12 pcs","Chicken Samosa 24 pcs","Fried Samosa","Fried Spring Roll","Chicken Roll 12 pcs","Chicken Roll 24 pcs","Breading Flour","Chapli Kabab","Chicken Kofta"];
 const masalaProducts = ["ACHAR GOSHT 22G","BIRYANI 39G","BLACK PEPPER 25G","BOMBAY BIRYANI 35G","BOMBAY BIRYANI 70G","BROAST 97G","CHAAT MASALA 45G","CHATPATA CHAAT MASALA 15G","CHICKEN JALFREZI 50G","CHICKEN TANDOORI 20G","CHICKEN TANDOORI 40G","CHICKEN TIKKA 20G","CHICKEN TIKKA 40G","CHILLI POWDER 50G","DAIGHI DANEDAR HALEEM 293G","GARAM MASALA POWDER 25G","KARAHI 24G","KARAHI 47G","KOFTA 43G","MURGHI 21G","MURGHI MASALA 43G","NIHARI 28G","NIHARI 56G","PAYA MASALA 39G","PULAO 35G","PULAO BIRYANI 25G","PULAO BIRYANI 50G","Quick Cook HALEEM (POFF) 300G","QUICK COOK HALEEM 300G","QUORMA 100G","QUORMA 21G","SHAMI KABAB 22G","SINDHI BIRYANI 41G","TIKKA BOTI 22G","TURMERIC POWDER 50G"];
 const groceryProducts = ["Chocobliss Crave-Coco Powder 50gm ","Chocobliss Crave-Dark Bar 200gm","Chocobliss Crave-Milky Bar 200gm ","Chocobliss Double Chocolate GB 180gm ","Chocobliss Hazelnut Spread GB 180gm ","Chocobliss Hazelnut Spread GB 350gm ","Chocobliss Milky Spread GB 180gm x 24","Chocobliss Milky Spread GB 350gm x24","Chocobliss Peanut Chocolate GB 180gm x24","DI Butter Salted 100gm x36","DI Butter Salted 200gm x24","DI Cheddar Shred 200gm 48Pcs","DI Desi Ghee TP 1000gm X 6","DI Desi Ghee TP 500gm X12","DI Mozzarella Shred 200gm x48","DI Pizza Cheese Shred 200gm x48","Youngs BeeHives Squeeze PB 170gm x48","Youngs BeeHives Squeeze PB 250gm x48","Youngs BeeHives Squeeze PB 450gm x24","Youngs Chicken Spread PH 1000ml x12","Youngs Chicken Spread PH 100ml 3x36","Youngs Chicken Spread PH 200ml x48","Youngs Chicken Spread PH 500ml x24","Youngs Chicken Spread SC 25gm 10x24","Youngs Chkn Spr Black Pepper 200ml PHx4","Youngs Chkn Spr Black Pepper 500ml PH x 24","Youngs Chocolate Spread GB 170gm x24","Youngs Chocolate Spread GB 360gm x24","Youngs Creamy Mayonnaise PH 200ml x48","Youngs Mayo Chup PH 200ml x48","Youngs Mayo Garlic PH 200ml x48","Youngs Mayo Red Chilli PH 200ml x48","Youngs Mayonnaise PH 1000ml x12","Youngs Mayonnaise PH 100ml 3x36","Youngs Mayonnaise PH 200ml x48","Youngs Mayonnaise PH 40ml 12X12","Youngs Mayonnaise PH 500ml x24","Youngs Natural Honey GB 125gm x48","Youngs Natural Honey GB 500gm x12","Youngs Orla Canola Oil Bottle 3 Ltr x 6","Youngs Orla Canola Oil PLW PH 1 Ltr x 5","Youngs Orla Canola Oil SAP 1 Ltr x 5","Youngs Orla Cooking Oil Bottle 3 Ltr x6","Youngs Orla Cooking Oil PLW PH 1 Ltr x 5","Coke 1.5 Ltr","Sprite 1.5 Ltr"];
 const allProducts = [
@@ -1579,6 +1711,17 @@ async function captureInvoice() {
 
 
 
+
+function openReportsMenu() {
+  document.getElementById('reportsMenuOverlay').classList.add('show');
+}
+function closeReportsMenu() {
+  document.getElementById('reportsMenuOverlay')?.classList.remove('show');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeReportsMenu();
+});
+
 function openSharePrintMenu() {
   document.getElementById('sharePrintOverlay').classList.add('show');
 }
@@ -1588,6 +1731,71 @@ function closeSharePrintMenu() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeSharePrintMenu();
 });
+
+
+/* ══════════ DOWNLOAD EXCEL (CSV) ══════════ */
+function downloadInvoiceExcel() {
+  if (!items.length) {
+    toast('Add products first, then download.', 'error');
+    return;
+  }
+  const invNo = document.getElementById('invoiceNo').value || 'invoice';
+  const date = document.getElementById('invoiceDate').value || '';
+  const cust = document.getElementById('customerName').value || '';
+  const shop = document.getElementById('shopName').value || '';
+  const maker = document.getElementById('billMaker').value || '';
+  const phone = document.getElementById('customerPhone').value || '';
+  const disc = parseFloat(document.getElementById('discount').value) || 0;
+  const paid = parseFloat(document.getElementById('amountPaid').value) || 0;
+  const sub = items.reduce((s, it) => s + it.amount, 0);
+  const grand = Math.max(0, sub - disc);
+  const balance = grand - paid;
+
+  function escCsv(v) {
+    const s = String(v == null ? '' : v);
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  const rows = [];
+  rows.push(['Star Chicken Invoice']);
+  rows.push(['Invoice No', invNo]);
+  rows.push(['Date', date]);
+  rows.push(['Customer', cust]);
+  rows.push(['Shop', shop]);
+  rows.push(['Prepared By', maker]);
+  rows.push(['Phone', phone]);
+  rows.push([]);
+  rows.push(['#', 'Product', 'Qty', 'Weight (kg)', 'Rate (Rs)', 'Amount (Rs)']);
+  items.forEach((it, i) => {
+    rows.push([
+      i + 1,
+      it.name || '',
+      it.qty != null ? it.qty : '',
+      it.weight != null ? Number(it.weight).toFixed(2) : '',
+      Math.round(Number(it.rate) || 0),
+      Math.round(Number(it.amount) || 0)
+    ]);
+  });
+  rows.push([]);
+  rows.push(['', '', '', '', 'Sub Total', Math.round(sub)]);
+  rows.push(['', '', '', '', 'Discount', Math.round(disc)]);
+  rows.push(['', '', '', '', 'Grand Total', Math.round(grand)]);
+  rows.push(['', '', '', '', 'Amount Paid', Math.round(paid)]);
+  rows.push(['', '', '', '', balance > 0.005 ? 'Balance Due' : (balance < -0.005 ? 'Change / Return' : 'Balance'), Math.round(Math.abs(balance))]);
+
+  const csv = '\uFEFF' + rows.map(r => r.map(escCsv).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const fileName = 'StarChicken_' + invNo.replace(/[^\w\-]/g, '_') + '.csv';
+  const link = document.createElement('a');
+  link.download = fileName;
+  link.href = URL.createObjectURL(blob);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(link.href), 8000);
+  toast('Excel file downloaded!', 'success');
+}
 
 /* ══════════ SAVE PNG ══════════ */
 async function saveAsPNG() {
@@ -1759,6 +1967,79 @@ function importInvoice(ev) {
 })();
 
 
+
+
+/* ══════════ PRODUCT SALE (item-wise daily) ══════════ */
+function setPsToday() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  document.getElementById('psDate').value = y + '-' + m + '-' + day;
+}
+function openProductSaleModal() {
+  setPsToday();
+  calcProductSale();
+  document.getElementById('productSaleOverlay').classList.add('show');
+}
+function closeProductSaleModal() {
+  document.getElementById('productSaleOverlay')?.classList.remove('show');
+}
+function calcProductSale() {
+  const dateStr = document.getElementById('psDate').value;
+  if (!dateStr) { setPsToday(); return calcProductSale(); }
+
+  // Aggregate items from invoices on this date
+  const map = {}; // name -> { qty, weight, amount, count }
+  const list = (typeof allHistory !== 'undefined' && allHistory) ? allHistory : [];
+  list.forEach(inv => {
+    const d = parseInvDate(inv);
+    if (!d) return;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    if ((y + '-' + m + '-' + day) !== dateStr) return;
+    const itemsArr = inv.items || [];
+    itemsArr.forEach(it => {
+      const name = (it.name || 'Unknown').trim() || 'Unknown';
+      if (!map[name]) map[name] = { qty: 0, weight: 0, amount: 0 };
+      map[name].qty += Number(it.qty) || 0;
+      map[name].weight += Number(it.weight) || 0;
+      map[name].amount += Number(it.amount) || 0;
+    });
+  });
+
+  const rows = Object.keys(map).map(name => ({
+    name,
+    qty: map[name].qty,
+    weight: map[name].weight,
+    amount: map[name].amount
+  })).sort((a, b) => b.weight - a.weight || b.amount - a.amount || a.name.localeCompare(b.name));
+
+  let totalQty = 0, totalWgt = 0;
+  rows.forEach(r => { totalQty += r.qty; totalWgt += r.weight; });
+
+  document.getElementById('psCount').textContent = rows.length;
+  document.getElementById('psQty').textContent = Math.round(totalQty * 100) / 100;
+  document.getElementById('psWgt').textContent = (Math.round(totalWgt * 100) / 100) + ' kg';
+
+  const tbody = document.getElementById('psBody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="ps-empty">No product sales on this date.</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr>
+      <td class="col-num">${i + 1}</td>
+      <td class="ps-name">${esc(r.name)}</td>
+      <td class="ps-qty">${r.qty ? (Math.round(r.qty * 100) / 100) : '—'}</td>
+      <td class="ps-num">${r.weight ? r.weight.toFixed(2) : '—'}</td>
+      <td class="ps-num">${fmt(r.amount)}</td>
+    </tr>`).join('');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeProductSaleModal();
+});
 
 /* ══════════ TOTAL SALE ══════════ */
 function openSalesModal() {
