@@ -771,12 +771,12 @@
   <div class="modal-backdrop" id="pwdModal">
     <div class="modal">
       <div class="modal-head">
-        <h3 id="pwdTitle">🔒 Enter Password</h3>
+        <h3>🔒 Enter Password</h3>
         <button class="modal-close" id="pwdClose" type="button">&times;</button>
       </div>
       <div class="modal-body">
-        <p id="pwdDesc" style="font-size:0.875rem;color:var(--slate);margin-bottom:14px;text-align:center;">Enter admin password to edit product prices.</p>
-        <input type="password" class="pwd-input" id="pwdInput" placeholder="••••" maxlength="4" autocomplete="off" />
+        <p style="font-size:0.875rem;color:var(--slate);margin-bottom:14px;text-align:center;">Enter admin password to edit product prices.</p>
+        <input type="password" class="pwd-input" id="pwdInput" placeholder="••••" maxlength="8" autocomplete="off" />
         <div class="pwd-error" id="pwdError">Incorrect password. Try again.</div>
       </div>
       <div class="modal-foot">
@@ -976,40 +976,26 @@
     const titles = {
       overview: "Overview",
       products: "Products & Prices",
-      orders: "Sale Staff",
+      orders: "Orders",
       branches: "Branches",
       contact: "Contact Info"
     };
 
-    function switchView(view, btn) {
-      document.querySelectorAll(".nav-item[data-view]").forEach(n => n.classList.remove("active"));
-      if (btn) btn.classList.add("active");
-      else {
-        const navBtn = document.querySelector('.nav-item[data-view="' + view + '"]');
-        if (navBtn) navBtn.classList.add("active");
-      }
-      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-      document.getElementById("view-" + view).classList.add("active");
-      document.getElementById("pageTitle").textContent = titles[view] || view;
-      document.getElementById("sidebar").classList.remove("open");
-      document.getElementById("overlay").classList.remove("show");
-    }
-
     document.querySelectorAll(".nav-item[data-view]").forEach(btn => {
       btn.addEventListener("click", () => {
         const view = btn.dataset.view;
-        if (view === "orders") {
-          // Require password for Sale Staff
-          pwdPurpose = "sale";
-          document.getElementById("pwdTitle").textContent = "🔒 Enter Password";
-          document.getElementById("pwdDesc").textContent = "Enter 4-digit password to access Sale Staff.";
-          pwdInput.value = "";
-          pwdError.classList.remove("show");
-          pwdModal.classList.add("show");
-          setTimeout(() => pwdInput.focus(), 50);
-          return;
-        }
-        switchView(view, btn);
+
+        document.querySelectorAll(".nav-item[data-view]").forEach(n => n.classList.remove("active"));
+        btn.classList.add("active");
+
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        document.getElementById("view-" + view).classList.add("active");
+
+        document.getElementById("pageTitle").textContent = titles[view] || view;
+
+        // Close mobile sidebar
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("overlay").classList.remove("show");
       });
     });
 
@@ -1028,19 +1014,14 @@
     const opts = { weekday: "short", year: "numeric", month: "short", day: "numeric" };
     document.getElementById("dateBadge").textContent = now.toLocaleDateString("en-PK", opts);
 
-    // ═══ PASSWORD (prices: 8627 | Sale Staff: 2627) ═══
+    // ═══ CHANGE PRICE (password 8627) ═══
     const PWD = "8627";
-    const SALE_PWD = "2627";
-    let pwdPurpose = "price";
     const pwdModal = document.getElementById("pwdModal");
     const editModal = document.getElementById("editModal");
     const pwdInput = document.getElementById("pwdInput");
     const pwdError = document.getElementById("pwdError");
 
     document.getElementById("changePriceBtn").addEventListener("click", () => {
-      pwdPurpose = "price";
-      document.getElementById("pwdTitle").textContent = "🔒 Enter Password";
-      document.getElementById("pwdDesc").textContent = "Enter admin password to edit product prices.";
       pwdInput.value = "";
       pwdError.classList.remove("show");
       pwdModal.classList.add("show");
@@ -1071,20 +1052,8 @@
     }
 
     document.getElementById("pwdSubmit").addEventListener("click", () => {
-      const entered = pwdInput.value;
-      if (pwdPurpose === "sale") {
-        if (entered === SALE_PWD) {
-          closePwd();
-          switchView("orders");
-        } else {
-          pwdError.classList.add("show");
-          pwdInput.value = "";
-          pwdInput.focus();
-        }
-      } else {
-        if (entered === PWD) openEditModal();
-        else { pwdError.classList.add("show"); pwdInput.value = ""; pwdInput.focus(); }
-      }
+      if (pwdInput.value === PWD) openEditModal();
+      else { pwdError.classList.add("show"); pwdInput.value = ""; pwdInput.focus(); }
     });
     pwdInput.addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("pwdSubmit").click(); });
 
