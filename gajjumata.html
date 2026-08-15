@@ -1241,6 +1241,7 @@ async function saveInvoice() {
     updateStatus();
     await refreshHistory();
     toast('Invoice ' + inv.invoiceNo + ' saved!', 'success');
+    newInvoice(true);  // auto start new blank invoice after save
     if (window.innerWidth <= 768) toggleSidebar();
   } catch (e) {
     toast('Could not save. Try again.', 'error');
