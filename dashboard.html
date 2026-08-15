@@ -455,6 +455,31 @@
     }
     .overlay.show { display: block; }
 
+
+
+ .logo { display: flex; align-items: center; gap: 0.65rem; }
+        .logo-mark {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            overflow: hidden;
+            border-top: 2px solid rgb(16, 3, 2);
+            border-right:2px solid rgb(92, 11, 11);
+            border-bottom:2px solid rgb(198, 11, 11);
+            border-left:2px solid #450b0b;
+            display: grid; place-itms: center;
+            box-shadow: 0 3px 10px rgba(159,18,57,0.28);
+            flex-shrink: 0;
+        }
+        .logo-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+
+    
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
@@ -492,8 +517,8 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <div class="sidebar-logo">🐔</div>
-        <div>
+            <a href="#" class="logo">
+            <div class="logo-mark"><img src="logo.jpg" alt="STAR CHICKEN"></div></a>
           <div class="sidebar-name">STAR <span>CHICKEN</span></div>
           <div class="sidebar-sub">Admin Dashboard</div>
         </div>
