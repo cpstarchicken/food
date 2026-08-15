@@ -442,28 +442,6 @@
     }
     .overlay.show { display: block; }
 
-
-
-      .logo { display: flex; align-items: center; gap: 0.65rem; }
-        .logo-mark {
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            overflow: hidden;
-            border-top: 2px solid rgb(16, 3, 2);
-            border-right:2px solid rgb(92, 11, 11);
-            border-bottom:2px solid rgb(198, 11, 11);
-            border-left:2px solid #450b0b;
-            display: grid; place-itms: center;
-            box-shadow: 0 3px 10px rgba(159,18,57,0.28);
-            flex-shrink: 0;
-        }
-        .logo-mark img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
@@ -501,9 +479,9 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-   
+        <div class="sidebar-logo">🐔</div>
+        <div>
           <div class="sidebar-name">STAR <span>CHICKEN</span></div>
-
           <div class="sidebar-sub">Admin Dashboard</div>
         </div>
       </div>
@@ -793,12 +771,12 @@
   <div class="modal-backdrop" id="pwdModal">
     <div class="modal">
       <div class="modal-head">
-        <h3>🔒 Enter Password</h3>
+        <h3 id="pwdTitle">🔒 Enter Password</h3>
         <button class="modal-close" id="pwdClose" type="button">&times;</button>
       </div>
       <div class="modal-body">
-        <p style="font-size:0.875rem;color:var(--slate);margin-bottom:14px;text-align:center;">Enter admin password to edit product prices.</p>
-        <input type="password" class="pwd-input" id="pwdInput" placeholder="••••" maxlength="8" autocomplete="off" />
+        <p id="pwdDesc" style="font-size:0.875rem;color:var(--slate);margin-bottom:14px;text-align:center;">Enter admin password to edit product prices.</p>
+        <input type="password" class="pwd-input" id="pwdInput" placeholder="••••" maxlength="4" autocomplete="off" />
         <div class="pwd-error" id="pwdError">Incorrect password. Try again.</div>
       </div>
       <div class="modal-foot">
@@ -998,26 +976,40 @@
     const titles = {
       overview: "Overview",
       products: "Products & Prices",
-      orders: "Orders",
+      orders: "Sale Staff",
       branches: "Branches",
       contact: "Contact Info"
     };
 
+    function switchView(view, btn) {
+      document.querySelectorAll(".nav-item[data-view]").forEach(n => n.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      else {
+        const navBtn = document.querySelector('.nav-item[data-view="' + view + '"]');
+        if (navBtn) navBtn.classList.add("active");
+      }
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById("view-" + view).classList.add("active");
+      document.getElementById("pageTitle").textContent = titles[view] || view;
+      document.getElementById("sidebar").classList.remove("open");
+      document.getElementById("overlay").classList.remove("show");
+    }
+
     document.querySelectorAll(".nav-item[data-view]").forEach(btn => {
       btn.addEventListener("click", () => {
         const view = btn.dataset.view;
-
-        document.querySelectorAll(".nav-item[data-view]").forEach(n => n.classList.remove("active"));
-        btn.classList.add("active");
-
-        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-        document.getElementById("view-" + view).classList.add("active");
-
-        document.getElementById("pageTitle").textContent = titles[view] || view;
-
-        // Close mobile sidebar
-        document.getElementById("sidebar").classList.remove("open");
-        document.getElementById("overlay").classList.remove("show");
+        if (view === "orders") {
+          // Require password for Sale Staff
+          pwdPurpose = "sale";
+          document.getElementById("pwdTitle").textContent = "🔒 Enter Password";
+          document.getElementById("pwdDesc").textContent = "Enter 4-digit password to access Sale Staff.";
+          pwdInput.value = "";
+          pwdError.classList.remove("show");
+          pwdModal.classList.add("show");
+          setTimeout(() => pwdInput.focus(), 50);
+          return;
+        }
+        switchView(view, btn);
       });
     });
 
@@ -1036,14 +1028,19 @@
     const opts = { weekday: "short", year: "numeric", month: "short", day: "numeric" };
     document.getElementById("dateBadge").textContent = now.toLocaleDateString("en-PK", opts);
 
-    // ═══ CHANGE PRICE (password 8627) ═══
+    // ═══ PASSWORD (prices: 8627 | Sale Staff: 2627) ═══
     const PWD = "8627";
+    const SALE_PWD = "2627";
+    let pwdPurpose = "price";
     const pwdModal = document.getElementById("pwdModal");
     const editModal = document.getElementById("editModal");
     const pwdInput = document.getElementById("pwdInput");
     const pwdError = document.getElementById("pwdError");
 
     document.getElementById("changePriceBtn").addEventListener("click", () => {
+      pwdPurpose = "price";
+      document.getElementById("pwdTitle").textContent = "🔒 Enter Password";
+      document.getElementById("pwdDesc").textContent = "Enter admin password to edit product prices.";
       pwdInput.value = "";
       pwdError.classList.remove("show");
       pwdModal.classList.add("show");
@@ -1074,8 +1071,20 @@
     }
 
     document.getElementById("pwdSubmit").addEventListener("click", () => {
-      if (pwdInput.value === PWD) openEditModal();
-      else { pwdError.classList.add("show"); pwdInput.value = ""; pwdInput.focus(); }
+      const entered = pwdInput.value;
+      if (pwdPurpose === "sale") {
+        if (entered === SALE_PWD) {
+          closePwd();
+          switchView("orders");
+        } else {
+          pwdError.classList.add("show");
+          pwdInput.value = "";
+          pwdInput.focus();
+        }
+      } else {
+        if (entered === PWD) openEditModal();
+        else { pwdError.classList.add("show"); pwdInput.value = ""; pwdInput.focus(); }
+      }
     });
     pwdInput.addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("pwdSubmit").click(); });
 
