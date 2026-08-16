@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Details | STAR CHICKEN</title>
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --red: #9f1239;
+      --red-mid: #be123c;
+      --red-soft: #e11d48;
+      --gold: #b45309;
+      --ink: #0c0a09;
+      --ink-2: #1c1917;
+      --ink-3: #44403c;
+      --muted: #78716c;
+      --line: #e7e5e4;
+      --surface: #ffffff;
+      --bg: #fafaf9;
+      --bg-2: #f5f5f4;
+      --wa: #16a34a;
+      --wa-dark: #15803d;
+      --radius: 12px;
+      --radius-lg: 18px;
+      --shadow: 0 1px 3px rgba(12,10,9,0.04), 0 4px 12px rgba(12,10,9,0.03);
+      --shadow-md: 0 4px 16px rgba(12,10,9,0.06), 0 8px 28px rgba(12,10,9,0.04);
+      --shadow-lg: 0 12px 40px rgba(12,10,9,0.08);
+      --ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* NAV */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      max-width: 960px; margin: 0 auto;
+      padding: 0 1.25rem; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 0.6rem; }
+    .logo-mark {
+      width: 38px; height: 38px; border-radius: 50%; overflow: hidden;
+      border: 2px solid var(--red); flex-shrink: 0;
+    }
+    .logo-mark img { width: 100%; height: 100%; object-fit: cover; }
+    .logo-text { font-weight: 800; font-size: 1.05rem; letter-spacing: -0.03em; }
+    .logo-text b { color: var(--red); }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.45rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.85rem; font-weight: 600;
+      color: var(--ink-3);
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      transition: var(--ease);
+    }
+    .back-btn:hover { color: var(--red); border-color: #fecdd3; background: #fff1f2; }
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.75rem 1.25rem 3rem;
+      width: 100%;
+    }
+
+    .detail-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    .detail-img-wrap {
+      position: relative;
+      background: var(--bg-2);
+      min-height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .detail-img-wrap img {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      max-height: 480px;
+      object-fit: cover;
+      display: block;
+    }
+    .detail-img-wrap .placeholder {
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-align: center;
+      padding: 2rem;
+    }
+    .badge-top {
+      position: absolute; top: 14px; left: 14px;
+      background: #fef3c7; color: #92400e;
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 0.3rem 0.7rem; border-radius: 999px;
+      z-index: 2;
+    }
+    .price-badge {
+      position: absolute; bottom: 14px; right: 14px;
+      background: var(--red); color: #fff;
+      font-weight: 700; font-size: 1.05rem;
+      padding: 0.4rem 0.85rem; border-radius: 9px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+
+    .detail-body {
+      padding: 1.75rem 1.6rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .detail-cat {
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--red);
+    }
+    .detail-name {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(1.6rem, 4vw, 2.1rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+    .detail-price {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--red);
+    }
+    .detail-price span {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .meta-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 0.35rem;
+    }
+    .meta-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .meta-row i {
+      width: 32px; height: 32px;
+      background: #fff1f2; color: var(--red);
+      border-radius: 8px;
+      display: grid; place-items: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .meta-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .meta-value {
+      font-size: 0.95rem;
+      font-weight: 650;
+      color: var(--ink);
+    }
+
+    .oos-note {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: none;
+    }
+    .oos-note.show { display: block; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.85rem 1.4rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      transition: var(--ease);
+    }
+    .btn-wa {
+      background: var(--wa);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(22,163,74,0.3);
+      flex: 1;
+      min-width: 180px;
+    }
+    .btn-wa:hover {
+      background: var(--wa-dark);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: var(--surface);
+      color: var(--ink-3);
+      border: 1.5px solid var(--line);
+    }
+    .btn-outline:hover {
+      border-color: #fda4af;
+      color: var(--red);
+      background: #fff1f2;
+    }
+
+    .desc-box {
+      margin-top: 0.25rem;
+      padding: 1rem 1.1rem;
+      background: var(--bg-2);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: var(--ink-3);
+      line-height: 1.6;
+    }
+
+    /* FOOTER mini */
+    .mini-foot {
+      text-align: center;
+      padding: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .mini-foot strong { color: var(--red); }
+
+    .error-state {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+    }
+    .error-state i {
+      font-size: 2.5rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .error-state h2 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .error-state p { color: var(--muted); margin-bottom: 1.5rem; }
+
+    @media (max-width: 720px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .detail-img-wrap img {
+        min-height: 260px;
+        max-height: 340px;
+      }
+      .detail-body { padding: 1.35rem 1.2rem 1.6rem; }
+      .actions { flex-direction: column; }
+      .btn-wa, .btn-outline { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark"><img src="logo.jpg" alt="STAR CHICKEN"></div>
+      <div class="logo-text">STAR <b>CHICKEN</b></div>
+    </a>
+    <a href="index.html#products" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Products
+    </a>
+  </div>
+</nav>
+
+<main class="main" id="main">
+  <!-- Filled by JS -->
+</main>
+
+<div class="mini-foot">
+  Copyright © 2026 <strong>STAR CHICKEN</strong> · Farm Fresh · 100% Hygienic
+</div>
+
+<script>
+  const WA_NUMBER = "923134110411";
+
+  function getParams() {
+    const p = new URLSearchParams(window.location.search);
+    return {
+      name: p.get("name") || "",
+      price: p.get("price") || "",
+      unit: p.get("unit") || "",
+      img: p.get("img") || "",
+      cat: p.get("cat") || "",
+      badge: p.get("badge") || "Fresh Quality",
+      oos: p.get("oos") === "1"
+    };
+  }
+
+  function catLabel(c) {
+    const map = {
+      parts: "Chicken Parts",
+      ready: "Ready to Cook",
+      value: "Half Cook",
+      marinated: "Marinated"
+    };
+    return map[c] || c || "Product";
+  }
+
+  function packingText(unit) {
+    if (!unit) return "—";
+    const u = unit.trim();
+    if (/kg/i.test(u) || /pcs/i.test(u) || /pack/i.test(u)) return u;
+    return u;
+  }
+
+  function priceDisplay(price, unit, cat) {
+    if (!price) return "—";
+    const isMar = cat === "marinated";
+    if (isMar || /\/kg/i.test(unit || "")) {
+      return `Rs. ${price} <span>/ kg</span>`;
+    }
+    return `Rs. ${price}`;
+  }
+
+  function orderMessage(name, price, unit) {
+    let msg = "Assalamualaikum! 👋\n\nI would like to order from *STAR CHICKEN*:\n\n";
+    msg += `• *${name}*\n`;
+    msg += `  Packing: ${unit || "—"}\n`;
+    msg += `  Price: Rs. ${price}\n\n`;
+    msg += "Please confirm availability and delivery. Thank you!";
+    return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  }
+
+  function render() {
+    const d = getParams();
+    const main = document.getElementById("main");
+
+    if (!d.name) {
+      main.innerHTML = `
+        <div class="error-state">
+          <i class="fas fa-box-open"></i>
+          <h2>Product not found</h2>
+          <p>No product was selected. Please go back and choose a product.</p>
+          <a href="index.html#products" class="btn btn-outline" style="display:inline-flex;">
+            <i class="fas fa-arrow-left"></i> Back to Products
+          </a>
+        </div>`;
+      document.title = "Product not found | STAR CHICKEN";
+      return;
+    }
+
+    document.title = `${d.name} | STAR CHICKEN`;
+
+    const imgHtml = d.img
+      ? `<img src="${escapeAttr(d.img)}" alt="${escapeAttr(d.name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+         <div class="placeholder" style="display:none;">Image not available</div>`
+      : `<div class="placeholder">No image available</div>`;
+
+    const oosClass = d.oos ? "show" : "";
+
+    main.innerHTML = `
+      <div class="detail-card">
+        <div class="detail-grid">
+          <div class="detail-img-wrap">
+            ${d.badge ? `<span class="badge-top">${escapeHtml(d.badge)}</span>` : ""}
+            ${d.price ? `<span class="price-badge">Rs. ${escapeHtml(d.price)}</span>` : ""}
+            ${imgHtml}
+          </div>
+          <div class="detail-body">
+            <div class="detail-cat">${escapeHtml(catLabel(d.cat))}</div>
+            <h1 class="detail-name">${escapeHtml(d.name)}</h1>
+            <div class="detail-price">${priceDisplay(d.price, d.unit, d.cat)}</div>
+
+            <div class="oos-note ${oosClass}">
+              <i class="fas fa-exclamation-circle"></i> This item is currently out of stock.
+            </div>
+
+            <div class="meta-list">
+              <div class="meta-row">
+                <i class="fas fa-box"></i>
+                <div>
+                  <div class="meta-label">Packing / Unit</div>
+                  <div class="meta-value">${escapeHtml(packingText(d.unit))}</div>
+                </div>
+              </div>
+              <div class="meta-row">
+                <i class="fas fa-tag"></i>
+                <div>
+                  <div class="meta-label">Price</div>
+                  <div class="meta-value">Rs. ${escapeHtml(d.price || "—")}${d.cat === "marinated" ? " / kg" : ""}</div>
+                </div>
+              </div>
+              <div class="meta-row">
+                <i class="fas fa-layer-group"></i>
+                <div>
+                  <div class="meta-label">Category</div>
+                  <div class="meta-value">${escapeHtml(catLabel(d.cat))}</div>
+                </div>
+              </div>
+              <div class="meta-row">
+                <i class="fas fa-certificate"></i>
+                <div>
+                  <div class="meta-label">Quality</div>
+                  <div class="meta-value">100% Hygienic · Farm Fresh</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="desc-box">
+              Premium quality chicken from STAR CHICKEN. Raised and processed under strict hygienic standards. Daily fresh delivery with cold-chain logistics across Lahore, Kasur & nearby areas.
+            </div>
+
+            <div class="actions">
+              <a href="${orderMessage(d.name, d.price, d.unit)}" class="btn btn-wa" target="_blank" rel="noopener">
+                <i class="fab fa-whatsapp"></i> Order on WhatsApp
+              </a>
+              <a href="index.html#products" class="btn btn-outline">
+                <i class="fas fa-th-large"></i> More Products
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement("div");
+    d.textContent = s == null ? "" : String(s);
+    return d.innerHTML;
+  }
+  function escapeAttr(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  render();
+</script>
+</body>
+</html>

@@ -307,6 +307,28 @@
             height: 135px;
             background-size: cover; background-position: center;
             position: relative;
+            cursor: pointer;
+        }
+        .card-img:hover {
+            filter: brightness(0.97);
+        }
+        .card-img .view-hint {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(12,10,9,0.35);
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .card-img:hover .view-hint {
+            opacity: 1;
         }
         .card-img::before {
             content: '';
@@ -1803,6 +1825,63 @@
 
       // Expose for chatbot
       window.__scPriceMap = priceMap;
+    })();
+
+    /* ═══ PRODUCT IMAGE → DETAILS PAGE ═══ */
+    (function initProductImageLinks() {
+      function getBgUrl(el) {
+        const bg = window.getComputedStyle(el).backgroundImage || el.style.backgroundImage || "";
+        const m = bg.match(/url\(["']?(.*?)["']?\)/i);
+        return m ? m[1] : "";
+      }
+
+      function isOutOfStock(card) {
+        const nameEl = card.querySelector(".card-name0, .card-name");
+        const unitEl = card.querySelector(".card-unit");
+        const t = ((nameEl && nameEl.textContent) || "") + " " + ((unitEl && unitEl.textContent) || "");
+        return /out of stock|not available/i.test(t);
+      }
+
+      function getBadge(card) {
+        const b = card.querySelector(".badge");
+        return b ? b.textContent.trim() : "Fresh Quality";
+      }
+
+      document.querySelectorAll(".card .card-img").forEach(img => {
+        // Hover hint
+        if (!img.querySelector(".view-hint")) {
+          const hint = document.createElement("div");
+          hint.className = "view-hint";
+          hint.innerHTML = '<i class="fas fa-search-plus"></i> View details';
+          img.appendChild(hint);
+        }
+
+        img.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const card = img.closest(".card");
+          if (!card) return;
+
+          const name = card.dataset.n || "";
+          const price = card.dataset.p || "";
+          const unit = (card.dataset.u || "").trim();
+          const cat = card.dataset.c || "";
+          const imgUrl = getBgUrl(img);
+          const badge = getBadge(card);
+          const oos = isOutOfStock(card) ? "1" : "0";
+
+          const params = new URLSearchParams({
+            name: name,
+            price: price,
+            unit: unit,
+            img: imgUrl,
+            cat: cat,
+            badge: badge,
+            oos: oos
+          });
+          window.location.href = "product.html?" + params.toString();
+        });
+      });
     })();
 </script>
 
