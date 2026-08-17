@@ -1241,7 +1241,6 @@ async function saveInvoice() {
     updateStatus();
     await refreshHistory();
     toast('Invoice ' + inv.invoiceNo + ' saved!', 'success');
-    newInvoice(true);  // auto start new blank invoice after save
     if (window.innerWidth <= 768) toggleSidebar();
   } catch (e) {
     toast('Could not save. Try again.', 'error');
@@ -1582,7 +1581,7 @@ function toast(msg, type) {
 }
 
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function fmt(n) { return Math.round(Number(n) || 0).toString(); }
+function fmt(n) { return Math.round(Number(n) || 0).toLocaleString('en-PK'); }
 
 ['customerName','shopName','billMaker','customerPhone','invoiceDate'].forEach(id => {
   document.getElementById(id)?.addEventListener('input', () => { markDirty(); updatePrintMeta(); });
