@@ -314,13 +314,14 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
 
 /* ─── Totals ─── */
 .footer-bar {
-  display: flex; justify-content: space-between; align-items: flex-end;
+  display: flex; justify-content: flex-end; align-items: flex-end;
   flex-wrap: wrap; gap: 14px; padding: 14px 16px;
   border-top: 1px solid var(--border); background: #FAFAFA;
 }
+.footer-bar .item-count { margin-right: auto; }
 .item-count { font-size: 0.82rem; color: var(--muted); }
 .item-count strong { color: var(--ink); font-weight: 700; }
-.totals-box { min-width: 200px; flex: 1; max-width: 260px; }
+.totals-box { min-width: 220px; flex: 0 0 auto; max-width: 280px; margin-left: auto; }
 .t-row {
   display: flex; justify-content: space-between; align-items: center;
   padding: 4px 0; font-size: 0.88rem; gap: 10px;
@@ -443,7 +444,7 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
   .brand-text span { display: none; }
   .form-grid { grid-template-columns: 1fr; }
   .footer-bar { flex-direction: column; align-items: stretch; }
-  .totals-box { max-width: 100%; }
+  .totals-box { max-width: 100%; margin-left: 0; }
   .actions {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--surface); border-top: 1px solid var(--border);
@@ -1692,8 +1693,20 @@ async function captureInvoice() {
   const card = document.getElementById('invoiceCard');
   const noPrint = card.querySelectorAll('.no-print');
   const printShow = card.querySelectorAll('.print-show');
+  const footer = card.querySelector('.footer-bar');
+  const totals = card.querySelector('.totals-box');
   noPrint.forEach(el => { el.dataset._disp = el.style.display; el.style.display = 'none'; });
   printShow.forEach(el => { el.dataset._disp = el.style.display; el.style.display = 'block'; });
+  // Force totals box to the right side for PNG
+  if (footer) { footer.dataset._jc = footer.style.justifyContent; footer.style.justifyContent = 'flex-end'; }
+  if (totals) {
+    totals.dataset._ml = totals.style.marginLeft;
+    totals.dataset._mw = totals.style.maxWidth;
+    totals.dataset._fl = totals.style.flex;
+    totals.style.marginLeft = 'auto';
+    totals.style.maxWidth = '280px';
+    totals.style.flex = '0 0 auto';
+  }
   updatePrintMeta();
   calcTotals();
   try {
@@ -1708,6 +1721,12 @@ async function captureInvoice() {
   } finally {
     noPrint.forEach(el => { el.style.display = el.dataset._disp || ''; });
     printShow.forEach(el => { el.style.display = el.dataset._disp || 'none'; });
+    if (footer) footer.style.justifyContent = footer.dataset._jc || '';
+    if (totals) {
+      totals.style.marginLeft = totals.dataset._ml || '';
+      totals.style.maxWidth = totals.dataset._mw || '';
+      totals.style.flex = totals.dataset._fl || '';
+    }
   }
 }
 
