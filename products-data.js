@@ -1,5 +1,5 @@
 // STAR CHICKEN – Shared product prices
-// Generated from Admin Dashboard – 16/08/2026, 1:08:27 pm
+// Generated from Admin Dashboard – 20/08/2026, 7:22:32 pm
 // Upload this file to the SAME folder as index.html & dashboard.html
 // so ALL visitors see the updated prices.
 
@@ -7,32 +7,32 @@ window.SC_PRODUCTS = {
   "fresh": [
     {
       "name": "Skin",
-      "price": 140,
+      "price": 150,
       "unit": "/kg"
     },
     {
       "name": "Shank",
-      "price": 80,
+      "price": 90,
       "unit": "/kg"
     },
     {
       "name": "Neck",
-      "price": 150,
+      "price": 160,
       "unit": "/kg"
     },
     {
       "name": "Heart",
-      "price": 150,
+      "price": 160,
       "unit": "/kg"
     },
     {
       "name": "Gizzard",
-      "price": 210,
+      "price": 220,
       "unit": "/kg"
     },
     {
       "name": "Tail",
-      "price": 500,
+      "price": 520,
       "unit": "/kg"
     },
     {
@@ -42,37 +42,37 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Liver",
-      "price": 220,
+      "price": 240,
       "unit": "/kg"
     },
     {
       "name": "Carcass",
-      "price": 100,
+      "price": 120,
       "unit": "/kg"
     },
     {
       "name": "Thigh Trimming",
-      "price": 450,
+      "price": 460,
       "unit": "/kg"
     },
     {
       "name": "Trimming+Bone",
-      "price": 260,
+      "price": 270,
       "unit": "/kg"
     },
     {
       "name": "Trimming B",
-      "price": 580,
+      "price": 480,
       "unit": "/kg"
     },
     {
       "name": "Niblet A",
-      "price": 580,
+      "price": 600,
       "unit": "/kg"
     },
     {
       "name": "Niblet B",
-      "price": 370,
+      "price": 380,
       "unit": "/kg"
     },
     {
@@ -87,7 +87,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Mince (Eco)",
-      "price": 220,
+      "price": 230,
       "unit": "/kg"
     },
     {
@@ -97,52 +97,52 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Inner Fillet",
-      "price": 600,
+      "price": 620,
       "unit": "/kg"
     },
     {
       "name": "Slice Trimming A",
-      "price": 600,
+      "price": 620,
       "unit": "/kg"
     },
     {
       "name": "Drumsticks",
-      "price": 550,
+      "price": 560,
       "unit": "/kg"
     },
     {
       "name": "Karahi Cut",
-      "price": 580,
+      "price": 600,
       "unit": "/kg"
     },
     {
       "name": "Whole Birds",
-      "price": 580,
+      "price": 600,
       "unit": "/kg"
     },
     {
       "name": "Zinger S/L (Eco)",
-      "price": 820,
-      "unit": "/kg"
-    },
-    {
-      "name": "Zinger S/O (Eco)",
       "price": 830,
       "unit": "/kg"
     },
     {
+      "name": "Zinger S/O (Eco)",
+      "price": 850,
+      "unit": "/kg"
+    },
+    {
       "name": "Breast Fillet Standard",
-      "price": 800,
+      "price": 900,
       "unit": "/kg"
     },
     {
       "name": "Breast Boneless",
-      "price": 780,
+      "price": 850,
       "unit": "/kg"
     },
     {
       "name": "9 Cut Chicken",
-      "price": 600,
+      "price": 650,
       "unit": "/kg"
     }
   ],
@@ -201,31 +201,31 @@ window.SC_PRODUCTS = {
   "marinated": [
     {
       "name": "Marinated Wings",
-      "price": 653,
+      "price": 700,
       "unit": "/kg",
       "daily": true
     },
     {
       "name": "Marinated Drumstick",
-      "price": 653,
+      "price": 700,
       "unit": "/kg",
       "daily": true
     },
     {
       "name": "Marinated Zinger",
-      "price": 1032,
+      "price": 1100,
       "unit": "/kg",
       "daily": true
     },
     {
       "name": "Marinated Butterfly",
-      "price": 963,
+      "price": 1000,
       "unit": "/kg",
       "daily": true
     },
     {
       "name": "Injected Broast",
-      "price": 757,
+      "price": 750,
       "unit": "/kg",
       "daily": true
     }
