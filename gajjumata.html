@@ -747,6 +747,10 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
               <input type="date" id="invoiceDate">
             </div>
             <div class="form-group">
+              <label>Time (PKT)</label>
+              <input type="text" id="invoiceTime" readonly placeholder="--:--:-- --">
+            </div>
+            <div class="form-group">
               <label>Customer Name</label>
               <input type="text" id="customerName" placeholder="nova blank">
             </div>
@@ -1122,6 +1126,51 @@ function setCounter(n) {
   try { localStorage.setItem('sc_gajjumata_counter', n); } catch(e) {}
 }
 
+
+/* ══════════ PAKISTAN TIME (PKT = UTC+5, no DST) ══════════ */
+function getPakistanParts(dateObj) {
+  const d = dateObj ? new Date(dateObj) : new Date();
+  // Pakistan Standard Time is always UTC+5 (no daylight saving)
+  const pk = new Date(d.getTime() + (5 * 60 * 60 * 1000));
+  const y = pk.getUTCFullYear();
+  const mo = pk.getUTCMonth() + 1;
+  const day = pk.getUTCDate();
+  let h = pk.getUTCHours();
+  const mi = pk.getUTCMinutes();
+  const s = pk.getUTCSeconds();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return {
+    dateISO: y + '-' + String(mo).padStart(2, '0') + '-' + String(day).padStart(2, '0'),
+    timeStr: String(h12).padStart(2, '0') + ':' + String(mi).padStart(2, '0') + ':' + String(s).padStart(2, '0') + ' ' + ampm
+  };
+}
+function getPakistanTime(dateObj) { return getPakistanParts(dateObj).timeStr; }
+function getPakistanDateISO(dateObj) { return getPakistanParts(dateObj).dateISO; }
+function setInvoiceDateTimeNow() {
+  const parts = getPakistanParts();
+  const dateEl = document.getElementById('invoiceDate');
+  const timeEl = document.getElementById('invoiceTime');
+  if (dateEl) dateEl.value = parts.dateISO;
+  if (timeEl) timeEl.value = parts.timeStr;
+}
+let _pktClockTimer = null;
+function startPktLiveClock() {
+  stopPktLiveClock();
+  if (typeof currentId !== 'undefined' && currentId) return;
+  setInvoiceDateTimeNow();
+  try { updatePrintMeta(); } catch (e) {}
+  _pktClockTimer = setInterval(function () {
+    if (typeof currentId !== 'undefined' && currentId) { stopPktLiveClock(); return; }
+    const timeEl = document.getElementById('invoiceTime');
+    if (timeEl) timeEl.value = getPakistanTime();
+    try { updatePrintMeta(); } catch (e) {}
+  }, 1000);
+}
+function stopPktLiveClock() {
+  if (_pktClockTimer) { clearInterval(_pktClockTimer); _pktClockTimer = null; }
+}
+
 /* ══════════ STATE ══════════ */
 let items = [];
 let invoiceCounter = getCounter();
@@ -1142,7 +1191,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch(e) {}
   }
   document.getElementById('invoiceNo').value = 'SC-GJ-' + invoiceCounter;
-  document.getElementById('invoiceDate').valueAsDate = new Date();
+  setInvoiceDateTimeNow();
+  startPktLiveClock();
   setupSearch();
   await refreshHistory();
   updatePrintMeta();
@@ -1209,6 +1259,7 @@ function collectInvoice() {
     id: currentId || ('inv_' + Date.now() + '_' + Math.random().toString(36).slice(2,7)),
     invoiceNo: document.getElementById('invoiceNo').value,
     date: document.getElementById('invoiceDate').value,
+    time: (document.getElementById('invoiceTime') && document.getElementById('invoiceTime').value) || '',
     customerName: document.getElementById('customerName').value.trim(),
     shopName: document.getElementById('shopName').value.trim(),
     billMaker: document.getElementById('billMaker').value.trim(),
@@ -1228,6 +1279,10 @@ async function saveInvoice() {
     toast('Add at least one product before saving.', 'error');
     return;
   }
+  if (document.getElementById('invoiceTime')) {
+    document.getElementById('invoiceTime').value = getPakistanTime();
+  }
+  stopPktLiveClock();
   const inv = collectInvoice();
   try {
     await putInvoice(inv);
@@ -1258,7 +1313,11 @@ async function loadInvoice(id) {
   items = inv.items || [];
   editingIndex = -1;
   document.getElementById('invoiceNo').value = inv.invoiceNo || '';
+  stopPktLiveClock();
   document.getElementById('invoiceDate').value = inv.date || '';
+  if (document.getElementById('invoiceTime')) {
+    document.getElementById('invoiceTime').value = inv.time || (inv.savedAt ? getPakistanTime(inv.savedAt) : '');
+  }
   document.getElementById('customerName').value = inv.customerName || '';
   document.getElementById('shopName').value = inv.shopName || '';
   document.getElementById('billMaker').value = inv.billMaker || '';
@@ -1304,7 +1363,8 @@ function newInvoice(skipConfirm) {
   editingIndex = -1;
   invoiceCounter = getCounter();
   document.getElementById('invoiceNo').value = 'SC-GJ-' + invoiceCounter;
-  document.getElementById('invoiceDate').valueAsDate = new Date();
+  setInvoiceDateTimeNow();
+  startPktLiveClock();
   ['customerName','shopName','billMaker','customerPhone'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('discount').value = '0';
   document.getElementById('amountPaid').value = '0';
@@ -1560,6 +1620,7 @@ function calcTotals() {
 function updatePrintMeta() {
   const inv = document.getElementById('invoiceNo').value;
   const date = document.getElementById('invoiceDate').value || '—';
+  const time = (document.getElementById('invoiceTime') && document.getElementById('invoiceTime').value) ? document.getElementById('invoiceTime').value : '—';
   const cust = document.getElementById('customerName').value || '—';
   const shop = document.getElementById('shopName').value || '—';
   const maker = document.getElementById('billMaker').value || '—';
@@ -1567,11 +1628,12 @@ function updatePrintMeta() {
   document.getElementById('printMeta').innerHTML = `
     <div><div class="label">Invoice No</div><div class="value">${esc(inv)}</div></div>
     <div><div class="label">Date</div><div class="value">${esc(date)}</div></div>
+    <div><div class="label">Time (PKT)</div><div class="value">${esc(time)}</div></div>
     <div><div class="label">Customer</div><div class="value">${esc(cust)}</div></div>
     <div><div class="label">Shop</div><div class="value">${esc(shop)}</div></div>
     <div><div class="label">Prepared By</div><div class="value">${esc(maker)}</div></div>
     <div>${phone ? '<div class="label">Phone</div><div class="value">'+esc(phone)+'</div>' : ''}</div>`;
-  document.getElementById('printFooter').textContent = 'Prepared by: ' + (maker !== '—' ? maker : 'Star Chicken');
+  document.getElementById('printFooter').textContent = 'Prepared by: ' + (maker !== '—' ? maker : 'Star Chicken') + (time && time !== '—' ? ' · ' + time + ' PKT' : '');
 }
 
 function toast(msg, type) {
@@ -1584,7 +1646,7 @@ function toast(msg, type) {
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmt(n) { return Math.round(Number(n) || 0).toLocaleString('en-PK'); }
 
-['customerName','shopName','billMaker','customerPhone','invoiceDate'].forEach(id => {
+['customerName','shopName','billMaker','customerPhone','invoiceDate','invoiceTime'].forEach(id => {
   document.getElementById(id)?.addEventListener('input', () => { markDirty(); updatePrintMeta(); });
 });
 
@@ -1854,6 +1916,7 @@ function getInvoicePayload() {
     version: 1,
     invoiceNo: document.getElementById('invoiceNo').value,
     date: document.getElementById('invoiceDate').value,
+    time: (document.getElementById('invoiceTime') && document.getElementById('invoiceTime').value) || '',
     customerName: document.getElementById('customerName').value,
     shopName: document.getElementById('shopName').value,
     billMaker: document.getElementById('billMaker').value,
@@ -1925,6 +1988,7 @@ function importInvoice(ev) {
       }
       if (data.invoiceNo) document.getElementById('invoiceNo').value = data.invoiceNo;
       if (data.date) document.getElementById('invoiceDate').value = data.date;
+      if (document.getElementById('invoiceTime')) document.getElementById('invoiceTime').value = data.time || '';
       document.getElementById('customerName').value = data.customerName || '';
       document.getElementById('shopName').value = data.shopName || '';
       document.getElementById('billMaker').value = data.billMaker || '';
