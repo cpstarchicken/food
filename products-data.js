@@ -1,5 +1,5 @@
 // STAR CHICKEN – Shared product prices
-// Generated from Admin Dashboard – 15/09/2026, 2:57:17 pm
+// Generated from Admin Dashboard – 15/09/2026, 2:58:32 pm
 // Upload this file to the SAME folder as index.html & dashboard.html
 // so ALL visitors see the updated prices.
 
@@ -169,7 +169,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Chicken Fries",
-      "price": 1200,
+      "price": 1000,
       "unit": "/1 KG"
     },
     {
