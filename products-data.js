@@ -1,5 +1,5 @@
 // STAR CHICKEN – Shared product prices
-// Generated from Admin Dashboard – 11/09/2026, 11:07:24 am
+// Generated from Admin Dashboard – 15/09/2026, 2:37:46 pm
 // Upload this file to the SAME folder as index.html & dashboard.html
 // so ALL visitors see the updated prices.
 
@@ -22,7 +22,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Heart",
-      "price": 160,
+      "price": 150,
       "unit": "/kg"
     },
     {
@@ -32,7 +32,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Tail",
-      "price": 530,
+      "price": 540,
       "unit": "/kg"
     },
     {
@@ -52,92 +52,92 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Thigh Trimming",
-      "price": 460,
+      "price": 450,
       "unit": "/kg"
     },
     {
       "name": "Trimming+Bone",
-      "price": 300,
+      "price": 310,
       "unit": "/kg"
     },
     {
       "name": "Trimming B",
-      "price": 460,
+      "price": 450,
       "unit": "/kg"
     },
     {
       "name": "Niblet A",
-      "price": 600,
+      "price": 550,
       "unit": "/kg"
     },
     {
       "name": "Niblet B",
-      "price": 380,
-      "unit": "/kg"
-    },
-    {
-      "name": "Drummet A",
       "price": 350,
       "unit": "/kg"
     },
     {
-      "name": "Drummet B",
-      "price": 275,
-      "unit": "/kg"
-    },
-    {
-      "name": "Mince (Eco)",
-      "price": 240,
-      "unit": "/kg"
-    },
-    {
-      "name": "2 Joined Wings Skinless",
+      "name": "Drummet A",
       "price": 250,
       "unit": "/kg"
     },
     {
+      "name": "Drummet B",
+      "price": 200,
+      "unit": "/kg"
+    },
+    {
+      "name": "Mince (Eco)",
+      "price": 250,
+      "unit": "/kg"
+    },
+    {
+      "name": "2 Joined Wings Skinless",
+      "price": 230,
+      "unit": "/kg"
+    },
+    {
       "name": "Inner Fillet",
-      "price": 620,
+      "price": 600,
       "unit": "/kg"
     },
     {
       "name": "Slice Trimming A",
-      "price": 620,
+      "price": 600,
       "unit": "/kg"
     },
     {
       "name": "Drumsticks",
-      "price": 560,
+      "price": 550,
       "unit": "/kg"
     },
     {
       "name": "Karahi Cut",
-      "price": 600,
+      "price": 570,
       "unit": "/kg"
     },
     {
       "name": "Whole Birds",
-      "price": 600,
+      "price": 570,
       "unit": "/kg"
     },
     {
       "name": "Zinger S/L (Eco)",
-      "price": 830,
+      "price": 750,
       "unit": "/kg"
     },
     {
       "name": "Zinger S/O (Eco)",
-      "price": 850,
+      "price": 750,
       "unit": "/kg"
     },
     {
       "name": "Breast Fillet Standard",
-      "price": 900,
+      "price": 850,
       "unit": "/kg"
     },
     {
       "name": "Breast Boneless",
-      "price": 850,
+      "price": 800,
       "unit": "/kg"
     },
     {
@@ -169,7 +169,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Chicken Fries",
-      "price": 1000,
+      "price": 1200,
       "unit": "/1 KG"
     },
     {
