@@ -1,5 +1,5 @@
 // STAR CHICKEN – Shared product prices
-// Generated from Admin Dashboard – 15/09/2026, 2:37:46 pm
+// Generated from Admin Dashboard – 15/09/2026, 2:57:17 pm
 // Upload this file to the SAME folder as index.html & dashboard.html
 // so ALL visitors see the updated prices.
 
@@ -194,7 +194,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Kebab",
-      "price": 500,
+      "price": 600,
       "unit": "/0.5 kg"
     }
   ],
