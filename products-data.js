@@ -1,5 +1,5 @@
 // STAR CHICKEN – Shared product prices
-// Generated from Admin Dashboard – 15/09/2026, 2:58:32 pm
+// Generated from Admin Dashboard – 22/09/2026, 8:39:21 pm
 // Upload this file to the SAME folder as index.html & dashboard.html
 // so ALL visitors see the updated prices.
 
@@ -27,12 +27,12 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Gizzard",
-      "price": 220,
+      "price": 250,
       "unit": "/kg"
     },
     {
       "name": "Tail",
-      "price": 540,
+      "price": 550,
       "unit": "/kg"
     },
     {
@@ -62,7 +62,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Trimming B",
-      "price": 450,
+      "price": 500,
       "unit": "/kg"
     },
     {
@@ -97,52 +97,52 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Inner Fillet",
-      "price": 600,
+      "price": 580,
       "unit": "/kg"
     },
     {
       "name": "Slice Trimming A",
-      "price": 600,
+      "price": 580,
       "unit": "/kg"
     },
     {
       "name": "Drumsticks",
-      "price": 550,
+      "price": 530,
       "unit": "/kg"
     },
     {
       "name": "Karahi Cut",
-      "price": 570,
+      "price": 550,
       "unit": "/kg"
     },
     {
       "name": "Whole Birds",
-      "price": 570,
+      "price": 550,
       "unit": "/kg"
     },
     {
       "name": "Zinger S/L (Eco)",
-      "price": 750,
+      "price": 700,
       "unit": "/kg"
     },
     {
       "name": "Zinger S/O (Eco)",
-      "price": 750,
+      "price": 700,
       "unit": "/kg"
     },
     {
       "name": "Breast Fillet Standard",
-      "price": 850,
-      "unit": "/kg"
-    },
-    {
-      "name": "Breast Boneless",
       "price": 800,
       "unit": "/kg"
     },
     {
+      "name": "Breast Boneless",
+      "price": 750,
+      "unit": "/kg"
+    },
+    {
       "name": "9 Cut Chicken",
-      "price": 650,
+      "price": 600,
       "unit": "/kg"
     }
   ],
