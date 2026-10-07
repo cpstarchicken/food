@@ -1,5 +1,5 @@
 // STAR CHICKEN – Shared product prices
-// Generated from Admin Dashboard – 22/09/2026, 8:39:21 pm
+// Generated from Admin Dashboard – 07/10/2026, 11:11:00 am
 // Upload this file to the SAME folder as index.html & dashboard.html
 // so ALL visitors see the updated prices.
 
@@ -12,7 +12,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Shank",
-      "price": 90,
+      "price": 80,
       "unit": "/kg"
     },
     {
@@ -27,7 +27,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Gizzard",
-      "price": 250,
+      "price": 270,
       "unit": "/kg"
     },
     {
@@ -37,7 +37,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Wing Tip",
-      "price": 100,
+      "price": 110,
       "unit": "/kg"
     },
     {
@@ -52,17 +52,17 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Thigh Trimming",
-      "price": 450,
+      "price": 430,
       "unit": "/kg"
     },
     {
       "name": "Trimming+Bone",
-      "price": 310,
+      "price": 300,
       "unit": "/kg"
     },
     {
       "name": "Trimming B",
-      "price": 500,
+      "price": 480,
       "unit": "/kg"
     },
     {
@@ -72,17 +72,17 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Niblet B",
-      "price": 350,
+      "price": 330,
       "unit": "/kg"
     },
     {
       "name": "Drummet A",
-      "price": 250,
+      "price": 240,
       "unit": "/kg"
     },
     {
       "name": "Drummet B",
-      "price": 200,
+      "price": 180,
       "unit": "/kg"
     },
     {
@@ -122,12 +122,12 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Zinger S/L (Eco)",
-      "price": 700,
+      "price": 650,
       "unit": "/kg"
     },
     {
       "name": "Zinger S/O (Eco)",
-      "price": 700,
+      "price": 670,
       "unit": "/kg"
     },
     {
@@ -142,7 +142,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "9 Cut Chicken",
-      "price": 600,
+      "price": 650,
       "unit": "/kg"
     }
   ],
