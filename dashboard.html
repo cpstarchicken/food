@@ -682,9 +682,9 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path d="M9 14l2 2 4-4"/></svg>
                 <h3>Star Chicken</h3>
                 <p>click on <strong>POS</strong> for billing dashboard👇👇 </p>
-                <a href="https://star-chicken-rwpt.onrender.com/"  rel="noopener" class="wa-btn1" style="margin-top:20px;display:inline-flex;">
-                  POS
-                </a>
+                <button type="button" id="posBtn" class="wa-btn1" style="margin-top:20px;display:inline-flex;">
+                  🔒 POS
+                </button>
               </div>
             </div>
           </div>
@@ -785,7 +785,7 @@
     </div>
   </div>
 
-  <!-- Password Modal -->
+  <!-- Password Modal (Price Edit) -->
   <div class="modal-backdrop" id="pwdModal">
     <div class="modal">
       <div class="modal-head">
@@ -800,6 +800,25 @@
       <div class="modal-foot">
         <button class="modal-btn ghost" id="pwdCancel" type="button">Cancel</button>
         <button class="modal-btn primary" id="pwdSubmit" type="button">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POS Password Modal -->
+  <div class="modal-backdrop" id="posPwdModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>🔒 Enter POS Password</h3>
+        <button class="modal-close" id="posPwdClose" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.875rem;color:var(--slate);margin-bottom:14px;text-align:center;">Enter 4-digit password to open the POS billing dashboard.</p>
+        <input type="password" class="pwd-input" id="posPwdInput" placeholder="••••" maxlength="4" inputmode="numeric" autocomplete="off" />
+        <div class="pwd-error" id="posPwdError">Incorrect password. Try again.</div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" id="posPwdCancel" type="button">Cancel</button>
+        <button class="modal-btn primary" id="posPwdSubmit" type="button">Unlock</button>
       </div>
     </div>
   </div>
@@ -1074,6 +1093,39 @@
       else { pwdError.classList.add("show"); pwdInput.value = ""; pwdInput.focus(); }
     });
     pwdInput.addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("pwdSubmit").click(); });
+
+    // ═══ POS LOCK (password 2627) ═══
+    const POS_PWD = "2627";
+    const POS_URL = "https://star-chicken-rwpt.onrender.com/";
+    const posPwdModal = document.getElementById("posPwdModal");
+    const posPwdInput = document.getElementById("posPwdInput");
+    const posPwdError = document.getElementById("posPwdError");
+
+    document.getElementById("posBtn").addEventListener("click", () => {
+      posPwdInput.value = "";
+      posPwdError.classList.remove("show");
+      posPwdModal.classList.add("show");
+      setTimeout(() => posPwdInput.focus(), 50);
+    });
+
+    function closePosPwd() { posPwdModal.classList.remove("show"); }
+    document.getElementById("posPwdClose").addEventListener("click", closePosPwd);
+    document.getElementById("posPwdCancel").addEventListener("click", closePosPwd);
+    posPwdModal.addEventListener("click", e => { if (e.target === posPwdModal) closePosPwd(); });
+
+    document.getElementById("posPwdSubmit").addEventListener("click", () => {
+      if (posPwdInput.value === POS_PWD) {
+        closePosPwd();
+        window.open(POS_URL, "_blank", "noopener");
+      } else {
+        posPwdError.classList.add("show");
+        posPwdInput.value = "";
+        posPwdInput.focus();
+      }
+    });
+    posPwdInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") document.getElementById("posPwdSubmit").click();
+    });
 
     function closeEdit() { editModal.classList.remove("show"); }
     document.getElementById("editClose").addEventListener("click", closeEdit);
