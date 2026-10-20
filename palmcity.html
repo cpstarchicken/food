@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Star Chicken POS & Inventory & Branch Management</title>
+  <title>Star Chicken — Inventory & Branch Management (Online)</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1464,6 +1464,30 @@
             </div>
           </div>
 
+          <!-- BRANCHES -->
+          <div class="table-card" style="margin-top:20px">
+            <div class="table-header"><h3><i class="fas fa-store"></i> Branches</h3></div>
+            <div class="modal-body">
+              <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Poore system ke liye nayi branch yahan se add karein. Add hote hi wo Branch Stock, Transfers, Sales, Reports aur Employee ke Assigned Branch mein aa jati hai.</p>
+              <div class="table-responsive">
+                <table>
+                  <thead><tr><th>#</th><th>Branch</th><th>City</th><th>Address</th><th>Staff</th><th>Actions</th></tr></thead>
+                  <tbody id="settingsBranchTable"></tbody>
+                </table>
+              </div>
+              <input type="hidden" id="brEditId" />
+              <div class="form-row" style="margin-top:16px;align-items:flex-end">
+                <div class="form-group"><label>Branch Name</label><input class="form-control" id="brName" placeholder="e.g. Johar Town" /></div>
+                <div class="form-group"><label>City</label><input class="form-control" id="brCity" placeholder="e.g. Lahore" /></div>
+                <div class="form-group"><label>Address</label><input class="form-control" id="brAddress" placeholder="Area / address" /></div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+                <button class="btn btn-primary" id="brSaveBtn" onclick="saveBranchFromSettings()"><i class="fas fa-plus"></i> Add Branch</button>
+                <button class="btn btn-outline" id="brCancelBtn" onclick="resetBranchForm()" style="display:none">Cancel</button>
+              </div>
+            </div>
+          </div>
+
           <!-- STAFF / EMPLOYEES -->
           <div class="table-card" id="settingsStaffCard" style="margin-top:20px">
             <div class="table-header">
@@ -2393,7 +2417,7 @@ function catNorm(n) {
         { id: 149, name: 'Sprite 1.5 Ltr', sku: 'GR-046', barcode: '8907046', category: 'Grocery', purchase: 0, selling: 0, unit: 'PCS', minStock: 10, image: null },
       ],
       branches: [
-        { id: 1, name: 'Palm City', city: 'Lahore', address: 'Palm City' },
+        { id: 1, name: 'Hatchery', city: 'Lahore', address: 'Hatchery' },
         { id: 2, name: 'Kasur', city: 'Kasur', address: 'Kasur' },
         { id: 3, name: 'Gajjumata', city: 'Lahore', address: 'Gajjumata' },
         { id: 4, name: 'Mustafabad', city: 'Lahore', address: 'Mustafabad' },
@@ -2516,6 +2540,12 @@ function catNorm(n) {
       // Safety: every product's category must exist in the category list
       if (!Array.isArray(db.categories)) db.categories = defaultDB.categories.slice();
       (db.products || []).forEach(p => { if (p.category && !db.categories.includes(p.category)) db.categories.push(p.category); });
+      // One-time rename: Palm City -> Hatchery (branch id stays the same, so stock/sales/users are untouched)
+      if (!db._branchHatchery) {
+        const pc = (db.branches || []).find(b => b.id === 1 && b.name === 'Palm City');
+        if (pc) { pc.name = 'Hatchery'; if (!pc.address || pc.address === 'Palm City') pc.address = 'Hatchery'; }
+        db._branchHatchery = true;
+      }
       // Ensure Link Road branch exists
       if (!db.branches.find(b => b.id === 7 || b.name === 'Link Road')) {
         db.branches.push({ id: 7, name: 'Link Road', city: 'Lahore', address: 'Link Road' });
@@ -2856,7 +2886,7 @@ function catNorm(n) {
       else if (page === 'purchases') renderPurchases();
       else if (page === 'customers') renderCustomers();
       else if (page === 'employees') renderEmployees();
-      else if (page === 'settings') { renderSettingsStaff(); renderCategoryManager(); }
+      else if (page === 'settings') { renderSettingsBranches(); renderSettingsStaff(); renderCategoryManager(); }
     }
 
     // ==================== HELPERS ====================
@@ -3993,7 +4023,7 @@ function catNorm(n) {
           <td>${t.date}</td>
           <td style="white-space:nowrap">
             ${t.status === 'Pending' ? (
-              (currentUser.role !== 'Sales Staff' || +t.toBranchId === +currentUser.branchId)
+              (currentUser.role !== 'Sales Staff' || !currentUser.branchId || +t.toBranchId === +currentUser.branchId)
                 ? `<button class="btn btn-success btn-sm" onclick="openReceiveModal(${t.id})"><i class="fas fa-clipboard-check"></i> Receive</button>`
                 : ''
             ) + (
@@ -4288,7 +4318,7 @@ function catNorm(n) {
         : '<i class="fas fa-check"></i> Complete Invoice';
 
       const sel = document.getElementById('sBranch');
-      if (currentUser.role === 'Branch Manager' || currentUser.role === 'Sales Staff') {
+      if ((currentUser.role === 'Branch Manager' || currentUser.role === 'Sales Staff') && currentUser.branchId && getBranch(currentUser.branchId)) {
         sel.innerHTML = `<option value="${currentUser.branchId}">${getBranch(currentUser.branchId).name}</option>`;
         sel.disabled = true;
       } else {
@@ -6786,6 +6816,7 @@ function catNorm(n) {
         else if (u.role === 'All Branches Manager') location = 'All Branches';
         else if (u.role === 'Main Store Manager') location = 'Slaughter House';
         else if (b) location = b.name;
+        else location = 'All Branches';
 
         const accessList = (u.access && u.access.length)
           ? u.access.map(a => ALL_MODULES.find(m => m.id === a)?.label || a).join(', ')
@@ -6812,6 +6843,99 @@ function catNorm(n) {
       renderSettingsStaff();
     }
 
+    // ==================== BRANCH MANAGER (Settings) ====================
+    function renderSettingsBranches() {
+      const tb = document.getElementById('settingsBranchTable');
+      if (!tb) return;
+      tb.innerHTML = db.branches.map((b, i) => {
+        const staff = db.users.filter(u => u.branchId === b.id).length;
+        return `<tr><td>${i + 1}</td><td><strong>${catEsc(b.name)}</strong></td><td>${catEsc(b.city || '—')}</td><td>${catEsc(b.address || '—')}</td><td>${staff}</td>
+          <td><button class="btn btn-outline btn-sm" onclick="editBranchInSettings(${b.id})"><i class="fas fa-edit"></i> Edit</button>
+              <button class="btn btn-outline btn-sm" onclick="deleteBranchFromSettings(${b.id})"><i class="fas fa-trash"></i></button></td></tr>`;
+      }).join('') || '<tr><td colspan="6" class="empty-state">No branches</td></tr>';
+    }
+
+    function resetBranchForm() {
+      ['brEditId', 'brName', 'brCity', 'brAddress'].forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('brSaveBtn').innerHTML = '<i class="fas fa-plus"></i> Add Branch';
+      document.getElementById('brCancelBtn').style.display = 'none';
+    }
+
+    function editBranchInSettings(id) {
+      if (currentUser.role !== 'Super Admin') { toast('Only Super Admin can manage branches', 'error'); return; }
+      const b = getBranch(id);
+      if (!b) return;
+      document.getElementById('brEditId').value = b.id;
+      document.getElementById('brName').value = b.name || '';
+      document.getElementById('brCity').value = b.city || '';
+      document.getElementById('brAddress').value = b.address || '';
+      document.getElementById('brSaveBtn').innerHTML = '<i class="fas fa-save"></i> Update Branch';
+      document.getElementById('brCancelBtn').style.display = '';
+      document.getElementById('brName').focus();
+    }
+
+    function branchesChanged() {
+      saveDB();
+      // Branch dropdowns that fill themselves once: clear them so they rebuild with the new list
+      ['filterTransferBranch', 'filterReceiveBranch', 'filterSaleBranch', 'filterPrBranch', 'branchStockBranch'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const prev = el.value;
+        while (el.options.length > 1) el.remove(1);
+        el.dataset.prev = prev;
+      });
+      const brp = document.getElementById('brpBranch');
+      if (brp) [...brp.options].forEach(o => { if (o.value && o.value !== 'all') o.remove(); });
+      renderSettingsBranches();
+      renderSettingsStaff();
+      if (typeof renderBranches === 'function') renderBranches();
+    }
+
+    function saveBranchFromSettings() {
+      if (currentUser.role !== 'Super Admin') { toast('Only Super Admin can manage branches', 'error'); return; }
+      const name = document.getElementById('brName').value.trim().replace(/\s+/g, ' ');
+      const city = document.getElementById('brCity').value.trim() || 'Lahore';
+      const address = document.getElementById('brAddress').value.trim() || name;
+      const editId = document.getElementById('brEditId').value;
+      if (!name) { toast('Branch name likho', 'error'); return; }
+      if (db.branches.some(b => b.name.toLowerCase() === name.toLowerCase() && (!editId || b.id !== +editId))) {
+        toast('Is naam ki branch pehle se mojood hai', 'error'); return;
+      }
+      if (editId) {
+        const b = getBranch(+editId);
+        if (!b) return;
+        Object.assign(b, { name, city, address });
+        toast('Branch updated: ' + name, 'success');
+      } else {
+        const newId = Math.max(0, ...db.branches.map(b => b.id)) + 1;
+        db.branches.push({ id: newId, name, city, address });
+        addNotification('success', 'New branch added: ' + name);
+        toast('Branch added: ' + name, 'success');
+      }
+      resetBranchForm();
+      branchesChanged();
+    }
+
+    function deleteBranchFromSettings(id) {
+      if (currentUser.role !== 'Super Admin') { toast('Only Super Admin can manage branches', 'error'); return; }
+      const b = getBranch(id);
+      if (!b) return;
+      if (db.branches.length <= 1) { toast('Kam az kam ek branch honi chahiye', 'error'); return; }
+      const used =
+        db.sales.some(x => x.branchId === id) ||
+        (db.transfers || []).some(t => +t.toBranchId === id || +t.fromBranchId === id) ||
+        (db.purchaseRequests || []).some(r => r.branchId === id) ||
+        db.stock.some(x => x.locationType === 'branch' && x.locationId === id && x.qty > 0);
+      if (used) { toast(`"${b.name}" ka stock/sales/transfer record mojood hai, is liye delete nahi ho sakti`, 'error'); return; }
+      const staff = db.users.filter(u => u.branchId === id);
+      if (staff.length) { toast(`"${b.name}" par ${staff.length} employee assigned hain — pehle unki branch badlein`, 'error'); return; }
+      if (!confirm('Delete branch "' + b.name + '"?')) return;
+      db.branches = db.branches.filter(x => x.id !== id);
+      db.stock = db.stock.filter(x => !(x.locationType === 'branch' && x.locationId === id));
+      toast('Branch deleted', 'success');
+      branchesChanged();
+    }
+
     function renderSettingsStaff() {
       const card = document.getElementById('settingsStaffCard');
       const tb = document.getElementById('settingsStaffTable');
@@ -6826,6 +6950,7 @@ function catNorm(n) {
         else if (u.role === 'Mini Store Manager' || u.role === 'Main Store Manager') location = 'Slaughter House';
         else if (u.role === 'All Branches Manager') location = 'All Branches';
         else if (b) location = b.name;
+        else location = 'All Branches';
         return `<tr>
           <td><strong>${catEsc(u.name)}</strong></td>
           <td><span class="badge badge-info">${catEsc(roleDisplayName(u.role))}</span></td>
@@ -6841,8 +6966,8 @@ function catNorm(n) {
     function populateUserModal(editId) {
       document.getElementById('editUserId').value = editId || '';
       document.getElementById('userModalTitle').textContent = editId ? 'Edit Staff' : 'Add Staff';
-      document.getElementById('uBranch').innerHTML = db.branches.map(b =>
-        `<option value="${b.id}">${b.name}</option>`
+      document.getElementById('uBranch').innerHTML = '<option value="all">All Branches</option>' + db.branches.map(b =>
+        `<option value="${b.id}">${catEsc(b.name)}</option>`
       ).join('');
 
       const box = document.getElementById('uAccessChecks');
@@ -6866,7 +6991,7 @@ function catNorm(n) {
         document.getElementById('uName').value = u.name || '';
         document.getElementById('uPin').value = u.pin || '';
         roleSel.value = u.role;
-        if (u.branchId) document.getElementById('uBranch').value = u.branchId;
+        document.getElementById('uBranch').value = u.branchId ? String(u.branchId) : 'all';
         const access = u.access || (menus[u.role] || []).map(m => m.id);
         box.querySelectorAll('.u-access-cb').forEach(cb => {
           cb.checked = access.includes(cb.value);
@@ -6895,8 +7020,11 @@ function catNorm(n) {
       // Branch required for Branch Manager & Sales Staff; optional show for others except Super Admin
       const needsBranch = role === 'Branch Manager' || role === 'Sales Staff';
       if (branchGroup) branchGroup.style.display = (role === 'Super Admin') ? 'none' : '';
-      if (!needsBranch && role !== 'Super Admin') {
-        // keep visible so admin can optionally assign a branch
+      const bsel = document.getElementById('uBranch');
+      const isAdd = !document.getElementById('editUserId').value;
+      if (bsel && isAdd) {
+        if (needsBranch && bsel.value === 'all' && db.branches.length) bsel.value = String(db.branches[0].id);
+        else if (!needsBranch) bsel.value = 'all';
       }
 
       if (!keepAccess) {
@@ -6918,12 +7046,7 @@ function catNorm(n) {
       let branchId = null;
       if (role !== 'Super Admin') {
         const bv = document.getElementById('uBranch')?.value;
-        if (bv) branchId = +bv;
-      }
-      // Branch required for Branch Manager & Sales Staff
-      if ((role === 'Branch Manager' || role === 'Sales Staff') && !branchId) {
-        toast('Please select an assigned branch', 'error');
-        return;
+        if (bv && bv !== 'all') branchId = +bv;   // 'all' => null => sees every branch
       }
       const access = [...document.querySelectorAll('.u-access-cb:checked')].map(cb => cb.value);
 
@@ -6974,6 +7097,7 @@ function catNorm(n) {
       closeModal('userModal');
       renderEmployees();
       renderLoginRoles();
+      renderSettingsBranches();
     }
 
     function editUser(id) {
