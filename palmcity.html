@@ -1752,7 +1752,7 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
 </div>
 
 <div class="sales-overlay no-print" id="productSaleOverlay" onclick="if(event.target===this)closeProductSaleModal()">
-  <div class="sales-modal" role="dialog" aria-labelledby="psTitle" style="max-width:560px">
+  <div class="sales-modal" role="dialog" aria-labelledby="psTitle" style="max-width:640px">
     <div class="sales-modal-header">
       <h3 id="psTitle">📦 Product Sale</h3>
       <button class="btn btn-ghost btn-sm" onclick="closeProductSaleModal()" style="height:32px;padding:0 10px;">✕</button>
@@ -1798,11 +1798,12 @@ tbody tr:nth-child(even):hover { background: #FFFBF0; }
               <th>Product</th>
               <th style="text-align:right">Qty</th>
               <th style="text-align:right">Weight (kg)</th>
+              <th style="text-align:right">Sale/KG</th>
               <th style="text-align:right">Amount (Rs)</th>
             </tr>
           </thead>
           <tbody id="psBody">
-            <tr><td colspan="5"><div class="ps-empty">No sales on this date.</div></td></tr>
+            <tr><td colspan="6"><div class="ps-empty">No sales on this date.</div></td></tr>
           </tbody>
         </table>
       </div>
@@ -4315,12 +4316,14 @@ function calcProductSale() {
     });
   });
 
-  const rows = Object.keys(map).map(name => ({
-    name,
-    qty: map[name].qty,
-    weight: map[name].weight,
-    amount: map[name].amount
-  })).sort((a, b) => b.weight - a.weight || b.amount - a.amount || a.name.localeCompare(b.name));
+  const rows = Object.keys(map).map(name => {
+    const qty = map[name].qty;
+    const weight = map[name].weight;
+    const amount = map[name].amount;
+    // Effective Sale/KG = total amount ÷ total weight (weighted avg rate for the day)
+    const ratePerKg = weight > 0 ? amount / weight : 0;
+    return { name, qty, weight, amount, ratePerKg };
+  }).sort((a, b) => b.weight - a.weight || b.amount - a.amount || a.name.localeCompare(b.name));
 
   let totalQty = 0, totalWgt = 0;
   rows.forEach(r => { totalQty += r.qty; totalWgt += r.weight; });
@@ -4331,7 +4334,7 @@ function calcProductSale() {
 
   const tbody = document.getElementById('psBody');
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="ps-empty">No product sales on this date.</div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6"><div class="ps-empty">No product sales on this date.</div></td></tr>';
     return;
   }
   tbody.innerHTML = rows.map((r, i) => `
@@ -4340,6 +4343,7 @@ function calcProductSale() {
       <td class="ps-name">${esc(r.name)}</td>
       <td class="ps-qty">${r.qty ? (Math.round(r.qty * 100) / 100) : '—'}</td>
       <td class="ps-num">${r.weight ? r.weight.toFixed(2) : '—'}</td>
+      <td class="ps-num">${r.ratePerKg > 0 ? Math.round(r.ratePerKg) : '—'}</td>
       <td class="ps-num">${fmt(r.amount)}</td>
     </tr>`).join('');
 }
@@ -4830,9 +4834,9 @@ function exportAllInvoicesExcel() {
 
   // Product summary (top section on same sheet)
   applyRow(ws1, r, ['PRODUCT-WISE SUMMARY'], [sSection]);
-  setMerges(ws1, [{ s: { r: r, c: 0 }, e: { r: r, c: 3 } }]);
+  setMerges(ws1, [{ s: { r: r, c: 0 }, e: { r: r, c: 4 } }]);
   r++;
-  const prodHeaders = ['Product', 'Total Qty', 'Total Weight (kg)', 'Total Amount (Rs)'];
+  const prodHeaders = ['Product', 'Total Qty', 'Total Weight (kg)', 'Sale/KG (Rs)', 'Total Amount (Rs)'];
   applyRow(ws1, r, prodHeaders, prodHeaders.map(() => sHeader));
   r++;
   const prodNames = Object.keys(productMap).sort((a, b) => productMap[b].amount - productMap[a].amount);
@@ -4842,13 +4846,14 @@ function exportAllInvoicesExcel() {
     prodQty += p.qty;
     prodWgt += p.weight;
     prodAmt += p.amount;
-    const st = i % 2 ? [sAlt, sAltNum, Object.assign({}, sAltNum, { numFmt: '#,##0.00' }), sAltNum] : [sCell, sCellNum, sCellNum2, sCellNum];
-    applyRow(ws1, r, [name, Math.round(p.qty * 100) / 100, Math.round(p.weight * 100) / 100, Math.round(p.amount)], st);
+    const ratePerKg = p.weight > 0 ? Math.round(p.amount / p.weight) : '';
+    const st = i % 2 ? [sAlt, sAltNum, Object.assign({}, sAltNum, { numFmt: '#,##0.00' }), sAltNum, sAltNum] : [sCell, sCellNum, sCellNum2, sCellNum, sCellNum];
+    applyRow(ws1, r, [name, Math.round(p.qty * 100) / 100, Math.round(p.weight * 100) / 100, ratePerKg, Math.round(p.amount)], st);
     r++;
   });
-  applyRow(ws1, r, ['TOTAL', Math.round(prodQty * 100) / 100, Math.round(prodWgt * 100) / 100, Math.round(prodAmt)], [sTotalLabel, sTotal, Object.assign({}, sTotal, { numFmt: '#,##0.00' }), sTotal]);
+  applyRow(ws1, r, ['TOTAL', Math.round(prodQty * 100) / 100, Math.round(prodWgt * 100) / 100, '', Math.round(prodAmt)], [sTotalLabel, sTotal, Object.assign({}, sTotal, { numFmt: '#,##0.00' }), sTotal, sTotal]);
 
-  setColWidths(ws1, [28, 12, 16, 16, 16, 14, 14]);
+  setColWidths(ws1, [28, 12, 16, 14, 16, 14, 14]);
   ensureRange(ws1, r, 6);
   ws1['!rows'] = [{ hpt: 28 }, { hpt: 20 }];
   XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
@@ -4966,13 +4971,13 @@ function exportAllInvoicesExcel() {
   const ws4 = {};
   r = 0;
   applyRow(ws4, r, ['STAR CHICKEN — Product-wise Sales'], [sTitle]);
-  setMerges(ws4, [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }]);
+  setMerges(ws4, [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }]);
   r++;
   applyRow(ws4, r, ['Filter: ' + shopFilter + '  |  ' + fromStr + ' → ' + toStr], [sSubtitle]);
-  setMerges(ws4, [{ s: { r: 1, c: 0 }, e: { r: 1, c: 3 } }]);
+  setMerges(ws4, [{ s: { r: 1, c: 0 }, e: { r: 1, c: 5 } }]);
   r++;
   r++;
-  applyRow(ws4, r, ['#', 'Product', 'Total Qty', 'Total Weight (kg)', 'Total Amount (Rs)'], [sHeader, sHeader, sHeader, sHeader, sHeader]);
+  applyRow(ws4, r, ['#', 'Product', 'Total Qty', 'Total Weight (kg)', 'Sale/KG (Rs)', 'Total Amount (Rs)'], [sHeader, sHeader, sHeader, sHeader, sHeader, sHeader]);
   r++;
   prodQty = 0; prodWgt = 0; prodAmt = 0;
   prodNames.forEach((name, i) => {
@@ -4980,16 +4985,17 @@ function exportAllInvoicesExcel() {
     prodQty += p.qty;
     prodWgt += p.weight;
     prodAmt += p.amount;
+    const ratePerKg = p.weight > 0 ? Math.round(p.amount / p.weight) : '';
     const base = i % 2 ? sAlt : sCell;
     const baseN = i % 2 ? sAltNum : sCellNum;
     const baseN2 = Object.assign({}, baseN, { numFmt: '#,##0.00' });
-    applyRow(ws4, r, [i + 1, name, Math.round(p.qty * 100) / 100, Math.round(p.weight * 100) / 100, Math.round(p.amount)], [baseN, base, baseN, baseN2, baseN]);
+    applyRow(ws4, r, [i + 1, name, Math.round(p.qty * 100) / 100, Math.round(p.weight * 100) / 100, ratePerKg, Math.round(p.amount)], [baseN, base, baseN, baseN2, baseN, baseN]);
     r++;
   });
-  applyRow(ws4, r, ['', 'TOTAL', Math.round(prodQty * 100) / 100, Math.round(prodWgt * 100) / 100, Math.round(prodAmt)], [sTotal, sTotalLabel, sTotal, Object.assign({}, sTotal, { numFmt: '#,##0.00' }), sTotal]);
+  applyRow(ws4, r, ['', 'TOTAL', Math.round(prodQty * 100) / 100, Math.round(prodWgt * 100) / 100, '', Math.round(prodAmt)], [sTotal, sTotalLabel, sTotal, Object.assign({}, sTotal, { numFmt: '#,##0.00' }), sTotal, sTotal]);
 
-  setColWidths(ws4, [5, 32, 12, 16, 16]);
-  ensureRange(ws4, r, 4);
+  setColWidths(ws4, [5, 32, 12, 16, 12, 16]);
+  ensureRange(ws4, r, 5);
   ws4['!rows'] = [{ hpt: 28 }, { hpt: 18 }];
   XLSX.utils.book_append_sheet(wb, ws4, 'Products');
 
