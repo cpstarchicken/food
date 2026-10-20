@@ -1,5 +1,5 @@
 // STAR CHICKEN – Shared product prices
-// Generated from Admin Dashboard – 17/10/2026, 10:21:10 am
+// Generated from Admin Dashboard – 20/10/2026, 9:59:30 am
 // Upload this file to the SAME folder as index.html & dashboard.html
 // so ALL visitors see the updated prices.
 
@@ -22,17 +22,17 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Heart",
-      "price": 160,
+      "price": 180,
       "unit": "/kg"
     },
     {
       "name": "Gizzard",
-      "price": 280,
+      "price": 290,
       "unit": "/kg"
     },
     {
       "name": "Tail",
-      "price": 575,
+      "price": 580,
       "unit": "/kg"
     },
     {
@@ -42,7 +42,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Liver",
-      "price": 260,
+      "price": 270,
       "unit": "/kg"
     },
     {
@@ -77,12 +77,12 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Drummet A",
-      "price": 240,
+      "price": 350,
       "unit": "/kg"
     },
     {
       "name": "Drummet B",
-      "price": 180,
+      "price": 250,
       "unit": "/kg"
     },
     {
@@ -92,7 +92,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "2 Joined Wings Skinless",
-      "price": 230,
+      "price": 250,
       "unit": "/kg"
     },
     {
@@ -225,7 +225,7 @@ window.SC_PRODUCTS = {
     },
     {
       "name": "Injected Broast",
-      "price": 800,
+      "price": 900,
       "unit": "/kg",
       "daily": true
     }
